@@ -1,0 +1,688 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>VISOR INTEGRAL EsSalud | Monitoreo en Tiempo Real</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --essalud-blue: #0056b3;
+      --essalud-blue-dark: #003d82;
+      --essalud-blue-light: #e6f0fa;
+      --essalud-red: #c8102e;
+      --essalud-gray: #f5f7fa;
+      --essalud-text: #1a1a1a;
+      --transition: all 0.25s ease;
+    }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', 'Segoe UI', sans-serif;
+      background: var(--essalud-gray);
+      color: var(--essalud-text);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ===== HEADER COMPACTO ===== */
+    .header {
+      background: linear-gradient(135deg, var(--essalud-blue) 0%, var(--essalud-blue-dark) 100%);
+      padding: 8px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0, 86, 179, 0.2);
+      z-index: 100;
+      border-bottom: 3px solid var(--essalud-red);
+      height: 48px;
+    }
+
+    .header h1 {
+      font-size: 1.3rem;
+      font-weight: 700;
+      color: white;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    .header-info {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+    }
+
+    .status-badge {
+      background: rgba(255,255,255,0.15);
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 0.75rem;
+      color: white;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      border: 1px solid rgba(255,255,255,0.3);
+      font-weight: 500;
+      text-transform: uppercase;
+    }
+
+    .status-badge::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      background: #00d47a;
+      border-radius: 50%;
+      animation: pulse 2s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(0, 212, 122, 0.4); }
+      50% { box-shadow: 0 0 0 6px rgba(0, 212, 122, 0); }
+    }
+
+    .datetime-badge {
+      background: rgba(255,255,255,0.2);
+      padding: 4px 14px;
+      border-radius: 8px;
+      color: white;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      gap: 2px;
+      border: 1px solid rgba(255,255,255,0.3);
+      min-width: 140px;
+    }
+
+    .datetime-badge .time {
+      font-size: 0.95rem;
+      font-weight: 700;
+      line-height: 1;
+      letter-spacing: 0.5px;
+    }
+
+    .datetime-badge .date {
+      font-size: 0.7rem;
+      font-weight: 400;
+      opacity: 0.9;
+      text-transform: uppercase;
+    }
+
+    /* ===== BOTONES DE CONTROL ===== */
+    .controls {
+      padding: 8px 16px;
+      background: white;
+      border-bottom: 1px solid #d0d8e0;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-control {
+      padding: 6px 14px;
+      background: var(--essalud-blue);
+      color: white;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      transition: var(--transition);
+      text-transform: uppercase;
+    }
+
+    .btn-control:hover {
+      background: var(--essalud-blue-dark);
+      transform: translateY(-1px);
+    }
+
+    .btn-outline {
+      background: transparent;
+      border: 1px solid var(--essalud-blue);
+      color: var(--essalud-blue);
+    }
+
+    .btn-outline:hover {
+      background: var(--essalud-blue-light);
+    }
+
+    .panel-counter {
+      font-size: 0.85rem;
+      color: var(--essalud-text);
+      font-weight: 500;
+    }
+
+    /* ===== GRID DE VISORES ADAPTATIVO ===== */
+    .visor-container {
+      flex: 1;
+      padding: 6px;
+      overflow: hidden;
+    }
+
+    .visor {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      grid-template-rows: repeat(3, 1fr);
+      gap: 4px;
+      height: 100%;
+      width: 100%;
+    }
+
+    .cuadro {
+      background: white;
+      border-radius: 4px;
+      border: 1px solid #d0d8e0;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      transition: var(--transition);
+      box-shadow: 0 1px 4px rgba(0, 86, 179, 0.1);
+      position: relative;
+      min-height: 0;
+    }
+
+    .cuadro.hidden {
+      display: none;
+    }
+
+    .cuadro:hover {
+      border-color: var(--essalud-blue);
+      box-shadow: 0 4px 12px rgba(0, 86, 179, 0.25);
+      z-index: 10;
+    }
+
+    .cuadro::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
+      height: 2px;
+      background: linear-gradient(90deg, var(--essalud-blue), var(--essalud-red));
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .cuadro:hover::before {
+      opacity: 1;
+    }
+
+    .titulo-panel {
+      background: linear-gradient(135deg, var(--essalud-blue-light), white);
+      padding: 6px 10px;
+      font-weight: 700;
+      font-size: 0.75rem;
+      text-align: center;
+      color: var(--essalud-blue-dark);
+      border-bottom: 1px solid #d0d8e0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 6px;
+      min-height: 36px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      position: relative;
+    }
+
+    .panel-actions {
+      position: absolute;
+      right: 6px;
+      top: 50%;
+      transform: translateY(-50%);
+      display: flex;
+      gap: 4px;
+      opacity: 0;
+      transition: var(--transition);
+    }
+
+    .cuadro:hover .panel-actions {
+      opacity: 1;
+    }
+
+    .btn-action-panel {
+      width: 20px;
+      height: 20px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.85rem;
+      font-weight: 700;
+      line-height: 1;
+      transition: var(--transition);
+      color: white;
+    }
+
+    .btn-maximize {
+      background: var(--essalud-blue);
+    }
+
+    .btn-maximize:hover {
+      background: var(--essalud-blue-dark);
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .btn-close {
+      background: var(--essalud-red);
+    }
+
+    .btn-close:hover {
+      background: #a00d26;
+      transform: translateY(-50%) scale(1.1);
+    }
+
+    .icon-badge {
+      width: 22px;
+      height: 22px;
+      background: var(--essalud-blue);
+      color: white;
+      border-radius: 4px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+      flex-shrink: 0;
+    }
+
+    .cuadro:nth-child(1) .icon-badge { background: #2196f3; }
+    .cuadro:nth-child(2) .icon-badge { background: #9c27b0; }
+    .cuadro:nth-child(3) .icon-badge { background: #f44336; }
+    .cuadro:nth-child(4) .icon-badge { background: #ff9800; }
+    .cuadro:nth-child(5) .icon-badge { background: #4caf50; }
+    .cuadro:nth-child(6) .icon-badge { background: #3f51b5; }
+    .cuadro:nth-child(7) .icon-badge { background: #e91e63; }
+    .cuadro:nth-child(8) .icon-badge { background: #00bcd4; }
+    .cuadro:nth-child(9) .icon-badge { background: #607d8b; }
+
+    .contenido-iframe {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      background: #fafbfc;
+      min-height: 0;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+      background: white;
+    }
+
+    /* ===== RESPONSIVE ===== */
+    @media (max-width: 1400px) {
+      .visor {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: repeat(5, 1fr);
+      }
+    }
+
+    @media (max-width: 900px) {
+      .header {
+        height: auto;
+        padding: 6px 12px;
+        flex-direction: column;
+        gap: 8px;
+      }
+      
+      .header h1 {
+        font-size: 1.1rem;
+      }
+      
+      .header-info {
+        width: 100%;
+        justify-content: space-between;
+      }
+      
+      .datetime-badge {
+        min-width: auto;
+        flex: 1;
+        text-align: center;
+        align-items: center;
+      }
+      
+      .controls {
+        flex-direction: column;
+        padding: 6px 12px;
+        gap: 8px;
+      }
+      
+      .visor {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(9, auto);
+      }
+      
+      .visor-container {
+        padding: 4px;
+        overflow-y: auto;
+      }
+      
+      body {
+        overflow-y: auto;
+        height: auto;
+        min-height: 100vh;
+      }
+      
+      .cuadro {
+        min-height: 300px;
+      }
+    }
+
+    /* ===== ANIMACIONES DE ENTRADA ===== */
+    @keyframes slideIn {
+      from {
+        opacity: 0;
+        transform: translateY(8px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+
+    .cuadro {
+      animation: slideIn 0.3s ease forwards;
+      opacity: 0;
+    }
+
+    .cuadro:nth-child(1) { animation-delay: 0.05s; }
+    .cuadro:nth-child(2) { animation-delay: 0.1s; }
+    .cuadro:nth-child(3) { animation-delay: 0.15s; }
+    .cuadro:nth-child(4) { animation-delay: 0.2s; }
+    .cuadro:nth-child(5) { animation-delay: 0.25s; }
+    .cuadro:nth-child(6) { animation-delay: 0.3s; }
+    .cuadro:nth-child(7) { animation-delay: 0.35s; }
+    .cuadro:nth-child(8) { animation-delay: 0.4s; }
+    .cuadro:nth-child(9) { animation-delay: 0.45s; }
+  </style>
+</head>
+<body>
+
+  <!-- Header corporativo EsSalud -->
+  <header class="header">
+    <h1>ESSALUD EN LÍNEA</h1>
+    <div class="header-info">
+      <div class="status-badge">● EN LÍNEA</div>
+      <div class="datetime-badge">
+        <div class="time" id="currentTime">--:--:--</div>
+        <div class="date" id="currentDate">CARGANDO...</div>
+      </div>
+    </div>
+  </header>
+
+  <!-- Controles -->
+  <div class="controls">
+    <button class="btn-control btn-outline" onclick="restaurarTodo()">↺ RESTAURAR TODOS</button>
+    <div class="panel-counter" id="panelCounter">9 PANELES VISIBLES</div>
+  </div>
+
+  <!-- Contenedor de visores -->
+  <div class="visor-container">
+    <div class="visor">
+      
+      <!-- Panel 1 -->
+      <div class="cuadro" id="panel-1" data-src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml">
+        <div class="titulo-panel">
+          <span class="icon-badge">1</span>
+          Gestión de Citas Médicas
+          <div class="panel-actions">
+            <button class="btn-action-panel btn-maximize" onclick="maximizarPanel(1)" title="Maximizar en nueva pestaña">⛶</button>
+            <button class="btn-action-panel btn-close" onclick="ocultarPanel(1)" title="Ocultar panel">×</button>
+          </div>
+        </div>
+        <div class="contenido-iframe">
+          <iframe src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml" loading="lazy" title="Gestión de Citas"></iframe>
+        </div>
+      </div>
+
+      <!-- Panel 2 -->
+      <div class="cuadro" id="panel-2" data-src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml">
+        <div class="titulo-panel">
+          <span class="icon-badge">2</span>
+          Red de Referencias
+          <div class="panel-actions">
+            <button class="btn-action-panel btn-maximize" onclick="maximizarPanel(2)" title="Maximizar en nueva pestaña">⛶</button>
+            <button class="btn-action-panel btn-close" onclick="ocultarPanel(2)" title="Ocultar panel">×</button>
+          </div>
+        </div>
+        <div class="contenido-iframe">
+          <iframe src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml" loading="lazy" title="Referencias"></iframe>
+        </div>
+      </div>
+
+      <!-- Panel 3 -->
+      <div class="cuadro" id="panel-3" data-src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml">
+        <div class="titulo-panel">
+          <span class="icon-badge">3</span>
+          Hospital Rebagliati
+          <div class="panel-actions">
+            <button class="btn-action-panel btn-maximize" onclick="maximizarPanel(3)" title="Maximizar en nueva pestaña">⛶</button>
+            <button class="btn-action-panel btn-close" onclick="ocultarPanel(3)" title="Ocultar panel">×</button>
+          </div>
+        </div>
+        <div class="contenido-iframe">
+          <iframe src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml" loading="lazy" title="Monitoreo Rebagliati"></iframe>
+        </div>
+      </div>
+
+      <!-- Panel 4 -->
+      <div class="cuadro" id="panel-4" data-src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml">
+        <div class="titulo-panel">
+          <span class="icon-badge">4</span>
+          Documentación Extendida
+          <div class="panel-actions">
+            <button class="btn-action-panel btn-maximize" onclick="maximizarPanel(4)" title="Maximizar en nueva pestaña">⛶</button>
+            <button class="btn-action-panel btn-close" onclick="ocultarPanel(4)" title="Ocultar panel">×</button>
+          </div>
+        </div>
+        <div class="contenido-iframe">
+          <iframe src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml" loading="lazy" title="Documentación"></iframe>
+        </div>
+      </div>
+
+      <!-- Panel 5 -->
+      <div class="cuadro" id="panel-5" data-src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml">
+        <div class="titulo-panel">
+          <span class="icon-badge">5</span>
+          Atención Intercultural
+          <div class="panel-actions">
+            <button class="btn-action-panel btn-maximize" onclick="maximizarPanel(5)" title="Maximizar en nueva pestaña">⛶</button>
+            <button class="btn-action-panel btn-close" onclick="ocultarPanel(5)" title="Ocultar panel">×</button>
+          </div>
+        </div>
+        <div class="contenido-iframe">
+          <iframe src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml" loading="lazy" title="Atención Intercultural"></iframe>
+        </div>
+      </div>
+
+      <!-- Panel 6 -->
+      <div class="cuadro" id="panel-6" data-src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml">
+        <div class="titulo-panel">
+          <span class="icon-badge">6</span>
+          Reportes Estratégicos
+          <div class="panel-actions">
+            <button class="btn-action-panel btn-maximize" onclick="maximizarPanel(6)" title="Maximizar en nueva pestaña">⛶</button>
+            <button class="btn-action-panel btn-close" onclick="ocultarPanel(6)" title="Ocultar panel">×</button>
+          </div>
+        </div>
+        <div class="contenido-iframe">
+          <iframe src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml" loading="lazy" title="Reportes"></iframe>
+        </div>
+      </div>
+
+      <!-- Panel 7 -->
+      <div class="cuadro" id="panel-7" data-src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml">
+        <div class="titulo-panel">
+          <span class="icon-badge">7</span>
+          Gestión de Reclamos
+          <div class="panel-actions">
+            <button class="btn-action-panel btn-maximize" onclick="maximizarPanel(7)" title="Maximizar en nueva pestaña">⛶</button>
+            <button class="btn-action-panel btn-close" onclick="ocultarPanel(7)" title="Ocultar panel">×</button>
+          </div>
+        </div>
+        <div class="contenido-iframe">
+          <iframe src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml" loading="lazy" title="Reclamos"></iframe>
+        </div>
+      </div>
+
+      <!-- Panel 8 -->
+      <div class="cuadro" id="panel-8" data-src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml">
+        <div class="titulo-panel">
+          <span class="icon-badge">8</span>
+          Pacientes Crónicos
+          <div class="panel-actions">
+            <button class="btn-action-panel btn-maximize" onclick="maximizarPanel(8)" title="Maximizar en nueva pestaña">⛶</button>
+            <button class="btn-action-panel btn-close" onclick="ocultarPanel(8)" title="Ocultar panel">×</button>
+          </div>
+        </div>
+        <div class="contenido-iframe">
+          <iframe src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml" loading="lazy" title="Seguimiento Crónicos"></iframe>
+        </div>
+      </div>
+
+      <!-- Panel 9 -->
+      <div class="cuadro" id="panel-9" data-src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml">
+        <div class="titulo-panel">
+          <span class="icon-badge">9</span>
+          COLA
+          <div class="panel-actions">
+            <button class="btn-action-panel btn-maximize" onclick="maximizarPanel(9)" title="Maximizar en nueva pestaña">⛶</button>
+            <button class="btn-action-panel btn-close" onclick="ocultarPanel(9)" title="Ocultar panel">×</button>
+          </div>
+        </div>
+        <div class="contenido-iframe">
+          <iframe src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml" loading="lazy" title="Cola"></iframe>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <script>
+    // ===== ACTUALIZACIÓN DE FECHA Y HORA =====
+    function updateDateTime() {
+      const now = new Date();
+      
+      // Formato de hora: HH:MM:SS
+      const timeOptions = { 
+        hour: '2-digit', 
+        minute: '2-digit', 
+        second: '2-digit', 
+        hour12: false 
+      };
+      
+      // Formato de fecha: Día, DD de Mes de YYYY
+      const dateOptions = { 
+        weekday: 'short', 
+        year: 'numeric', 
+        month: 'short', 
+        day: '2-digit' 
+      };
+      
+      const timeString = now.toLocaleTimeString('es-PE', timeOptions);
+      const dateString = now.toLocaleDateString('es-PE', dateOptions).toUpperCase();
+      
+      document.getElementById('currentTime').textContent = timeString;
+      document.getElementById('currentDate').textContent = dateString;
+    }
+    
+    // Actualizar inmediatamente y luego cada segundo
+    updateDateTime();
+    setInterval(updateDateTime, 1000);
+
+    // Función para ocultar panel
+    function ocultarPanel(numero) {
+      const panel = document.getElementById(`panel-${numero}`);
+      if (panel) {
+        panel.classList.add('hidden');
+        actualizarContador();
+        ajustarGrid();
+      }
+    }
+
+    // Función para maximizar panel en nueva pestaña
+    function maximizarPanel(numero) {
+      const panel = document.getElementById(`panel-${numero}`);
+      if (panel) {
+        const url = panel.getAttribute('data-src');
+        window.open(url, `_blank_panel_${numero}`, 'noopener,noreferrer');
+      }
+    }
+
+    // Función para restaurar todos los paneles
+    function restaurarTodo() {
+      for (let i = 1; i <= 9; i++) {
+        const panel = document.getElementById(`panel-${i}`);
+        if (panel) {
+          panel.classList.remove('hidden');
+        }
+      }
+      actualizarContador();
+      ajustarGrid();
+    }
+
+    // Ajustar grid dinámicamente según paneles visibles
+    function ajustarGrid() {
+      const visor = document.querySelector('.visor');
+      const panelesVisibles = document.querySelectorAll('.cuadro:not(.hidden)').length;
+      
+      // Forzar 3x3 si hay 9 paneles visibles
+      if (panelesVisibles === 9) {
+        visor.style.gridTemplateColumns = 'repeat(3, 1fr)';
+        visor.style.gridTemplateRows = 'repeat(3, 1fr)';
+      } else if (panelesVisibles <= 1) {
+        visor.style.gridTemplateColumns = '1fr';
+        visor.style.gridTemplateRows = '1fr';
+      } else if (panelesVisibles <= 4) {
+        visor.style.gridTemplateColumns = 'repeat(2, 1fr)';
+        visor.style.gridTemplateRows = 'repeat(2, 1fr)';
+      } else if (panelesVisibles <= 6) {
+        visor.style.gridTemplateColumns = 'repeat(3, 1fr)';
+        visor.style.gridTemplateRows = 'repeat(2, 1fr)';
+      } else {
+        visor.style.gridTemplateColumns = 'repeat(3, 1fr)';
+        visor.style.gridTemplateRows = 'repeat(3, 1fr)';
+      }
+    }
+
+    // Actualizar contador de paneles visibles
+    function actualizarContador() {
+      const visibles = document.querySelectorAll('.cuadro:not(.hidden)').length;
+      document.getElementById('panelCounter').textContent = `${visibles} PANELES VISIBLES`;
+    }
+
+    // Manejo de errores en iframes
+    document.querySelectorAll('iframe').forEach(iframe => {
+      iframe.addEventListener('error', function() {
+        this.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#c8102e;font-weight:500;font-size:0.85rem;">⚠️ MÓDULO NO DISPONIBLE</div>';
+      });
+    });
+
+    // Inicializar
+    actualizarContador();
+    ajustarGrid();
+
+    // Ajustar grid al redimensionar ventana
+    window.addEventListener('resize', ajustarGrid);
+  </script>
+
+</body>
+</html>
