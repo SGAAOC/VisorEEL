@@ -3,686 +3,215 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>VISOR INTEGRAL EsSalud | Monitoreo en Tiempo Real</title>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+  <title>ESSALUD EN LÍNEA | Monitoreo Profesional</title>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;700;900&display=swap" rel="stylesheet">
   <style>
     :root {
-      --essalud-blue: #0056b3;
-      --essalud-blue-dark: #003d82;
-      --essalud-blue-light: #e6f0fa;
-      --essalud-red: #c8102e;
-      --essalud-gray: #f5f7fa;
-      --essalud-text: #1a1a1a;
-      --transition: all 0.25s ease;
+      --azul-reniec: #002e5d; 
+      --rojo-gob: #e30613;
+      --white: #ffffff;
+      --bg-body: #cfd8dc;
     }
 
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
 
     body {
-      font-family: 'Roboto', 'Segoe UI', sans-serif;
-      background: var(--essalud-gray);
-      color: var(--essalud-text);
+      font-family: 'Roboto', sans-serif;
+      background: var(--bg-body);
       height: 100vh;
-      overflow: hidden;
       display: flex;
       flex-direction: column;
+      overflow: hidden;
     }
 
-    /* ===== HEADER COMPACTO ===== */
+    /* CABECERA */
     .header {
-      background: linear-gradient(135deg, var(--essalud-blue) 0%, var(--essalud-blue-dark) 100%);
-      padding: 8px 16px;
+      background: var(--azul-reniec);
+      height: 80px;
       display: flex;
+      align-items: center;
       justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 8px rgba(0, 86, 179, 0.2);
-      z-index: 100;
-      border-bottom: 3px solid var(--essalud-red);
-      height: 48px;
+      padding: 0 30px;
+      border-bottom: 4px solid var(--rojo-gob);
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+      z-index: 1100;
+      color: var(--white);
     }
 
-    .header h1 {
-      font-size: 1.3rem;
-      font-weight: 700;
-      color: white;
-      letter-spacing: 0.5px;
-      text-transform: uppercase;
-    }
+    .header-left { display: flex; align-items: center; gap: 20px; }
+    .logo-text { font-weight: 900; font-size: 1.6rem; text-transform: uppercase; }
+    .header-divider { width: 1px; height: 30px; background: rgba(255,255,255,0.3); margin: 0 15px; }
+    .header-title h1 { font-size: 1.1rem; font-weight: 700; text-transform: uppercase; opacity: 0.9; }
 
-    .header-info {
-      display: flex;
-      align-items: center;
-      gap: 16px;
-    }
+    /* RELOJ BLANCO */
+    .header-right { display: flex; align-items: center; gap: 25px; }
+    .clock-box { text-align: right; border-left: 1px solid rgba(255,255,255,0.3); padding-left: 20px; }
+    #currentTime { font-size: 2rem; font-weight: 400; color: var(--white); display: block; line-height: 1; }
+    #currentDate { font-size: 0.7rem; color: var(--white); text-transform: uppercase; font-weight: 700; margin-top: 4px; opacity: 0.8; }
 
-    .status-badge {
-      background: rgba(255,255,255,0.15);
-      padding: 4px 12px;
-      border-radius: 12px;
-      font-size: 0.75rem;
-      color: white;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      border: 1px solid rgba(255,255,255,0.3);
-      font-weight: 500;
-      text-transform: uppercase;
-    }
-
-    .status-badge::before {
-      content: "";
-      width: 6px;
-      height: 6px;
-      background: #00d47a;
-      border-radius: 50%;
-      animation: pulse 2s infinite;
-    }
-
-    @keyframes pulse {
-      0%, 100% { box-shadow: 0 0 0 0 rgba(0, 212, 122, 0.4); }
-      50% { box-shadow: 0 0 0 6px rgba(0, 212, 122, 0); }
-    }
-
-    .datetime-badge {
-      background: rgba(255,255,255,0.2);
-      padding: 4px 14px;
-      border-radius: 8px;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 2px;
-      border: 1px solid rgba(255,255,255,0.3);
-      min-width: 140px;
-    }
-
-    .datetime-badge .time {
-      font-size: 0.95rem;
-      font-weight: 700;
-      line-height: 1;
-      letter-spacing: 0.5px;
-    }
-
-    .datetime-badge .date {
-      font-size: 0.7rem;
-      font-weight: 400;
-      opacity: 0.9;
-      text-transform: uppercase;
-    }
-
-    /* ===== BOTONES DE CONTROL ===== */
-    .controls {
-      padding: 8px 16px;
-      background: white;
-      border-bottom: 1px solid #d0d8e0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 12px;
-    }
-
-    .btn-control {
-      padding: 6px 14px;
-      background: var(--essalud-blue);
-      color: white;
-      border: none;
-      border-radius: 4px;
-      font-size: 0.8rem;
-      font-weight: 600;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 6px;
-      transition: var(--transition);
-      text-transform: uppercase;
-    }
-
-    .btn-control:hover {
-      background: var(--essalud-blue-dark);
-      transform: translateY(-1px);
-    }
-
-    .btn-outline {
-      background: transparent;
-      border: 1px solid var(--essalud-blue);
-      color: var(--essalud-blue);
-    }
-
-    .btn-outline:hover {
-      background: var(--essalud-blue-light);
-    }
-
-    .panel-counter {
-      font-size: 0.85rem;
-      color: var(--essalud-text);
-      font-weight: 500;
-    }
-
-    /* ===== GRID DE VISORES ADAPTATIVO ===== */
-    .visor-container {
-      flex: 1;
-      padding: 6px;
-      overflow: hidden;
-    }
-
+    /* CONTENEDOR DE VISORES */
+    .visor-container { flex: 1; padding: 12px; position: relative; overflow: hidden; }
+    
+    /* GRID DINÁMICO */
     .visor {
       display: grid;
-      grid-template-columns: repeat(3, 1fr);
-      grid-template-rows: repeat(3, 1fr);
-      gap: 4px;
+      grid-template-columns: repeat(auto-fit, minmax(30%, 1fr));
+      gap: 12px;
       height: 100%;
       width: 100%;
     }
 
     .cuadro {
       background: white;
-      border-radius: 4px;
-      border: 1px solid #d0d8e0;
+      border: 1px solid var(--azul-reniec);
+      border-radius: 6px;
       display: flex;
       flex-direction: column;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.1);
       overflow: hidden;
-      transition: var(--transition);
-      box-shadow: 0 1px 4px rgba(0, 86, 179, 0.1);
-      position: relative;
-      min-height: 0;
+      transition: all 0.3s ease;
     }
 
-    .cuadro.hidden {
-      display: none;
-    }
-
-    .cuadro:hover {
-      border-color: var(--essalud-blue);
-      box-shadow: 0 4px 12px rgba(0, 86, 179, 0.25);
-      z-index: 10;
-    }
-
-    .cuadro::before {
-      content: "";
+    /* ESTADO MAXIMIZADO */
+    .cuadro.maximized {
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      height: 2px;
-      background: linear-gradient(90deg, var(--essalud-blue), var(--essalud-red));
-      opacity: 0;
-      transition: var(--transition);
+      top: 12px;
+      left: 12px;
+      right: 12px;
+      bottom: 12px;
+      z-index: 2000;
+      width: calc(100% - 24px);
+      height: calc(100% - 24px);
     }
 
-    .cuadro:hover::before {
-      opacity: 1;
-    }
-
+    /* TITULOS CENTRALIZADOS */
     .titulo-panel {
-      background: linear-gradient(135deg, var(--essalud-blue-light), white);
-      padding: 6px 10px;
-      font-weight: 700;
-      font-size: 0.75rem;
-      text-align: center;
-      color: var(--essalud-blue-dark);
-      border-bottom: 1px solid #d0d8e0;
+      background: var(--azul-reniec);
+      padding: 8px 12px;
       display: flex;
       align-items: center;
-      justify-content: center;
-      gap: 6px;
-      min-height: 36px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      min-height: 35px;
       position: relative;
     }
 
-    .panel-actions {
-      position: absolute;
-      right: 6px;
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
-      gap: 4px;
-      opacity: 0;
-      transition: var(--transition);
-    }
-
-    .cuadro:hover .panel-actions {
-      opacity: 1;
-    }
-
-    .btn-action-panel {
-      width: 20px;
-      height: 20px;
-      border: none;
-      border-radius: 4px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+    .titulo-panel span {
       font-size: 0.85rem;
       font-weight: 700;
-      line-height: 1;
-      transition: var(--transition);
+      color: var(--white);
+      text-transform: uppercase;
+      margin: 0 auto; /* Centra el texto */
+    }
+
+    /* BOTONES ACCIÓN */
+    .panel-actions {
+      position: absolute;
+      right: 10px;
+      display: flex;
+      gap: 8px;
+    }
+
+    .btn-action {
+      background: rgba(255,255,255,0.2);
+      border: none;
       color: white;
-    }
-
-    .btn-maximize {
-      background: var(--essalud-blue);
-    }
-
-    .btn-maximize:hover {
-      background: var(--essalud-blue-dark);
-      transform: translateY(-50%) scale(1.1);
-    }
-
-    .btn-close {
-      background: var(--essalud-red);
-    }
-
-    .btn-close:hover {
-      background: #a00d26;
-      transform: translateY(-50%) scale(1.1);
-    }
-
-    .icon-badge {
-      width: 22px;
-      height: 22px;
-      background: var(--essalud-blue);
-      color: white;
-      border-radius: 4px;
+      font-size: 0.8rem;
+      cursor: pointer;
+      width: 24px;
+      height: 24px;
+      border-radius: 3px;
       display: flex;
       align-items: center;
       justify-content: center;
-      font-size: 0.75rem;
-      font-weight: 700;
-      flex-shrink: 0;
     }
 
-    .cuadro:nth-child(1) .icon-badge { background: #2196f3; }
-    .cuadro:nth-child(2) .icon-badge { background: #9c27b0; }
-    .cuadro:nth-child(3) .icon-badge { background: #f44336; }
-    .cuadro:nth-child(4) .icon-badge { background: #ff9800; }
-    .cuadro:nth-child(5) .icon-badge { background: #4caf50; }
-    .cuadro:nth-child(6) .icon-badge { background: #3f51b5; }
-    .cuadro:nth-child(7) .icon-badge { background: #e91e63; }
-    .cuadro:nth-child(8) .icon-badge { background: #00bcd4; }
-    .cuadro:nth-child(9) .icon-badge { background: #607d8b; }
+    .btn-action:hover { background: rgba(255,255,255,0.4); }
 
-    .contenido-iframe {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
-      background: #fafbfc;
-      min-height: 0;
+    .contenido-iframe { flex: 1; background: #fff; }
+    iframe { width: 100%; height: 100%; border: none; display: block; }
+
+    /* BOTÓN AÑADIR VISTA */
+    .add-panel-disabled {
+      border: 2px dashed #90a4ae;
+      background: rgba(255,255,255,0.5);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      color: #78909c;
+      cursor: not-allowed;
     }
-
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: block;
-      background: white;
-    }
-
-    /* ===== RESPONSIVE ===== */
-    @media (max-width: 1400px) {
-      .visor {
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(5, 1fr);
-      }
-    }
-
-    @media (max-width: 900px) {
-      .header {
-        height: auto;
-        padding: 6px 12px;
-        flex-direction: column;
-        gap: 8px;
-      }
-      
-      .header h1 {
-        font-size: 1.1rem;
-      }
-      
-      .header-info {
-        width: 100%;
-        justify-content: space-between;
-      }
-      
-      .datetime-badge {
-        min-width: auto;
-        flex: 1;
-        text-align: center;
-        align-items: center;
-      }
-      
-      .controls {
-        flex-direction: column;
-        padding: 6px 12px;
-        gap: 8px;
-      }
-      
-      .visor {
-        grid-template-columns: 1fr;
-        grid-template-rows: repeat(9, auto);
-      }
-      
-      .visor-container {
-        padding: 4px;
-        overflow-y: auto;
-      }
-      
-      body {
-        overflow-y: auto;
-        height: auto;
-        min-height: 100vh;
-      }
-      
-      .cuadro {
-        min-height: 300px;
-      }
-    }
-
-    /* ===== ANIMACIONES DE ENTRADA ===== */
-    @keyframes slideIn {
-      from {
-        opacity: 0;
-        transform: translateY(8px);
-      }
-      to {
-        opacity: 1;
-        transform: translateY(0);
-      }
-    }
-
-    .cuadro {
-      animation: slideIn 0.3s ease forwards;
-      opacity: 0;
-    }
-
-    .cuadro:nth-child(1) { animation-delay: 0.05s; }
-    .cuadro:nth-child(2) { animation-delay: 0.1s; }
-    .cuadro:nth-child(3) { animation-delay: 0.15s; }
-    .cuadro:nth-child(4) { animation-delay: 0.2s; }
-    .cuadro:nth-child(5) { animation-delay: 0.25s; }
-    .cuadro:nth-child(6) { animation-delay: 0.3s; }
-    .cuadro:nth-child(7) { animation-delay: 0.35s; }
-    .cuadro:nth-child(8) { animation-delay: 0.4s; }
-    .cuadro:nth-child(9) { animation-delay: 0.45s; }
   </style>
 </head>
 <body>
 
-  <!-- Header corporativo EsSalud -->
   <header class="header">
-    <h1>ESSALUD EN LÍNEA</h1>
-    <div class="header-info">
-      <div class="status-badge">● EN LÍNEA</div>
-      <div class="datetime-badge">
-        <div class="time" id="currentTime">--:--:--</div>
-        <div class="date" id="currentDate">CARGANDO...</div>
+    <div class="header-left">
+      <div class="logo-text">EsSalud</div>
+      <div class="header-divider"></div>
+      <div class="header-title"><h1>MONITOREO EN TIEMPO REAL</h1></div>
+    </div>
+    <div class="header-right">
+      <button onclick="location.reload()" style="padding: 5px 10px; cursor: pointer; border-radius: 4px; border:none; font-weight:bold; font-size:10px; margin-right:15px;">REINICIAR TODO</button>
+      <div class="clock-box">
+        <span id="currentTime">00:00:00</span>
+        <span id="currentDate">MARTES, 10 DE MARZO DE 2026</span>
       </div>
     </div>
   </header>
 
-  <!-- Controles -->
-  <div class="controls">
-    <button class="btn-control btn-outline" onclick="restaurarTodo()">↺ RESTAURAR TODOS</button>
-    <div class="panel-counter" id="panelCounter">9 PANELES VISIBLES</div>
-  </div>
-
-  <!-- Contenedor de visores -->
   <div class="visor-container">
-    <div class="visor">
-      
-      <!-- Panel 1 -->
-      <div class="cuadro" id="panel-1" data-src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml">
-        <div class="titulo-panel">
-          <span class="icon-badge">1</span>
-          ANEXOS EXTENDIDOS
-          <div class="panel-actions">
-            <button class="btn-action-panel btn-maximize" onclick="maximizarPanel(1)" title="Maximizar en nueva pestaña">⛶</button>
-            <button class="btn-action-panel btn-close" onclick="ocultarPanel(1)" title="Ocultar panel">×</button>
-          </div>
-        </div>
-        <div class="contenido-iframe">
-          <iframe src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml" loading="lazy" title="ANEXOS EXTENDIDOS"></iframe>
-        </div>
-      </div>
+    <div class="visor" id="visorGrid">
+      <script>
+        const urlAsterisk = "http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml";
+        const paneles = [
+          "OPCION 1 - CITAS", "OPCION 2 - REFERENCIA", "OPCION 3 - INFORME",
+          "OPCION 4 - PACIENTES CRÓNICOS", "OPCION 5 - RECLAMO", "OPCION 1.3 - REBAGLIATI",
+          "ANEXOS EXTENDIDOS", "INTERCULTURAL"
+        ];
 
-      <!-- Panel 2 -->
-      <div class="cuadro" id="panel-2" data-src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml">
-        <div class="titulo-panel">
-          <span class="icon-badge">2</span>
-          OPCION 1 - CITAS
-          <div class="panel-actions">
-            <button class="btn-action-panel btn-maximize" onclick="maximizarPanel(2)" title="Maximizar en nueva pestaña">⛶</button>
-            <button class="btn-action-panel btn-close" onclick="ocultarPanel(2)" title="Ocultar panel">×</button>
-          </div>
-        </div>
-        <div class="contenido-iframe">
-          <iframe src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml" loading="lazy" title="OPCION 1 - CITAS"></iframe>
-        </div>
-      </div>
+        paneles.forEach((titulo, index) => {
+          document.write(`
+            <div class="cuadro" id="panel-${index}">
+              <div class="titulo-panel">
+                <span>${titulo}</span>
+                <div class="panel-actions">
+                  <button class="btn-action" onclick="toggleMaximize('panel-${index}')" title="Maximizar">▢</button>
+                  <button class="btn-action" onclick="closePanel('panel-${index}')" title="Cerrar">✕</button>
+                </div>
+              </div>
+              <div class="contenido-iframe"><iframe src="${urlAsterisk}"></iframe></div>
+            </div>
+          `);
+        });
+      </script>
 
-      <!-- Panel 3 -->
-      <div class="cuadro" id="panel-3" data-src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml">
-        <div class="titulo-panel">
-          <span class="icon-badge">3</span>
-          OPCION 1.3 - REBAGLIATI
-          <div class="panel-actions">
-            <button class="btn-action-panel btn-maximize" onclick="maximizarPanel(3)" title="Maximizar en nueva pestaña">⛶</button>
-            <button class="btn-action-panel btn-close" onclick="ocultarPanel(3)" title="Ocultar panel">×</button>
-          </div>
-        </div>
-        <div class="contenido-iframe">
-          <iframe src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml" loading="lazy" title="OPCION 1.3 - REBAGLIATI"></iframe>
-        </div>
+      <div class="cuadro add-panel-disabled" id="add-btn">
+        <div style="font-size: 3rem;">+</div>
+        <div style="font-size: 0.8rem; font-weight: 700;">AÑADIR VISTA</div>
       </div>
-
-      <!-- Panel 4 -->
-      <div class="cuadro" id="panel-4" data-src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml">
-        <div class="titulo-panel">
-          <span class="icon-badge">4</span>
-          INTERCULTURAL
-          <div class="panel-actions">
-            <button class="btn-action-panel btn-maximize" onclick="maximizarPanel(4)" title="Maximizar en nueva pestaña">⛶</button>
-            <button class="btn-action-panel btn-close" onclick="ocultarPanel(4)" title="Ocultar panel">×</button>
-          </div>
-        </div>
-        <div class="contenido-iframe">
-          <iframe src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml" loading="lazy" title="INTERCULTURAL"></iframe>
-        </div>
-      </div>
-
-      <!-- Panel 5 -->
-      <div class="cuadro" id="panel-5" data-src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml">
-        <div class="titulo-panel">
-          <span class="icon-badge">5</span>
-          OPCION 2 - REFERENCIA
-          <div class="panel-actions">
-            <button class="btn-action-panel btn-maximize" onclick="maximizarPanel(5)" title="Maximizar en nueva pestaña">⛶</button>
-            <button class="btn-action-panel btn-close" onclick="ocultarPanel(5)" title="Ocultar panel">×</button>
-          </div>
-        </div>
-        <div class="contenido-iframe">
-          <iframe src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml" loading="lazy" title="OPCION 2 - REFERENCIA"></iframe>
-        </div>
-      </div>
-
-      <!-- Panel 6 -->
-      <div class="cuadro" id="panel-6" data-src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml">
-        <div class="titulo-panel">
-          <span class="icon-badge">6</span>
-          OPCION 3 - INFORME
-          <div class="panel-actions">
-            <button class="btn-action-panel btn-maximize" onclick="maximizarPanel(6)" title="Maximizar en nueva pestaña">⛶</button>
-            <button class="btn-action-panel btn-close" onclick="ocultarPanel(6)" title="Ocultar panel">×</button>
-          </div>
-        </div>
-        <div class="contenido-iframe">
-          <iframe src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml" loading="lazy" title="OPCION 3 - INFORME"></iframe>
-        </div>
-      </div>
-
-      <!-- Panel 7 -->
-      <div class="cuadro" id="panel-7" data-src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml">
-        <div class="titulo-panel">
-          <span class="icon-badge">7</span>
-          OPCION 5 - RECLAMO
-          <div class="panel-actions">
-            <button class="btn-action-panel btn-maximize" onclick="maximizarPanel(7)" title="Maximizar en nueva pestaña">⛶</button>
-            <button class="btn-action-panel btn-close" onclick="ocultarPanel(7)" title="Ocultar panel">×</button>
-          </div>
-        </div>
-        <div class="contenido-iframe">
-          <iframe src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml" loading="lazy" title="OPCION 5 - RECLAMO"></iframe>
-        </div>
-      </div>
-
-      <!-- Panel 8 -->
-      <div class="cuadro" id="panel-8" data-src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml">
-        <div class="titulo-panel">
-          <span class="icon-badge">8</span>
-          OPCION 4 - PACIENTES CRÓNICOS
-          <div class="panel-actions">
-            <button class="btn-action-panel btn-maximize" onclick="maximizarPanel(8)" title="Maximizar en nueva pestaña">⛶</button>
-            <button class="btn-action-panel btn-close" onclick="ocultarPanel(8)" title="Ocultar panel">×</button>
-          </div>
-        </div>
-        <div class="contenido-iframe">
-          <iframe src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml" loading="lazy" title="OPCION 4 - PACIENTES CRÓNICOS"></iframe>
-        </div>
-      </div>
-
-      <!-- Panel 9 -->
-      <div class="cuadro" id="panel-9" data-src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml">
-        <div class="titulo-panel">
-          <span class="icon-badge">9</span>
-          COLA
-          <div class="panel-actions">
-            <button class="btn-action-panel btn-maximize" onclick="maximizarPanel(9)" title="Maximizar en nueva pestaña">⛶</button>
-            <button class="btn-action-panel btn-close" onclick="ocultarPanel(9)" title="Ocultar panel">×</button>
-          </div>
-        </div>
-        <div class="contenido-iframe">
-          <iframe src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml" loading="lazy" title="COLA"></iframe>
-        </div>
-      </div>
-
     </div>
   </div>
 
   <script>
-    // ===== ACTUALIZACIÓN DE FECHA Y HORA =====
     function updateDateTime() {
       const now = new Date();
-      
-      // Formato de hora: HH:MM:SS
-      const timeOptions = { 
-        hour: '2-digit', 
-        minute: '2-digit', 
-        second: '2-digit', 
-        hour12: false 
-      };
-      
-      // Formato de fecha: Día, DD de Mes de YYYY
-      const dateOptions = { 
-        weekday: 'short', 
-        year: 'numeric', 
-        month: 'short', 
-        day: '2-digit' 
-      };
-      
-      const timeString = now.toLocaleTimeString('es-PE', timeOptions);
-      const dateString = now.toLocaleDateString('es-PE', dateOptions).toUpperCase();
-      
-      document.getElementById('currentTime').textContent = timeString;
-      document.getElementById('currentDate').textContent = dateString;
+      document.getElementById('currentTime').innerText = now.toLocaleTimeString('es-PE', {hour12:false});
+      const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' };
+      document.getElementById('currentDate').innerText = now.toLocaleDateString('es-PE', options).toUpperCase();
     }
-    
-    // Actualizar inmediatamente y luego cada segundo
-    updateDateTime();
     setInterval(updateDateTime, 1000);
+    updateDateTime();
 
-    // Función para ocultar panel
-    function ocultarPanel(numero) {
-      const panel = document.getElementById(`panel-${numero}`);
-      if (panel) {
-        panel.classList.add('hidden');
-        actualizarContador();
-        ajustarGrid();
-      }
+    function toggleMaximize(panelId) {
+      const panel = document.getElementById(panelId);
+      panel.classList.toggle('maximized');
     }
 
-    // Función para maximizar panel en nueva pestaña
-    function maximizarPanel(numero) {
-      const panel = document.getElementById(`panel-${numero}`);
-      if (panel) {
-        const url = panel.getAttribute('data-src');
-        window.open(url, `_blank_panel_${numero}`, 'noopener,noreferrer');
-      }
+    function closePanel(panelId) {
+      const panel = document.getElementById(panelId);
+      panel.style.display = 'none';
+      // Al cerrar, el grid se ajusta automáticamente gracias a repeat(auto-fit)
     }
-
-    // Función para restaurar todos los paneles
-    function restaurarTodo() {
-      for (let i = 1; i <= 9; i++) {
-        const panel = document.getElementById(`panel-${i}`);
-        if (panel) {
-          panel.classList.remove('hidden');
-        }
-      }
-      actualizarContador();
-      ajustarGrid();
-    }
-
-    // Ajustar grid dinámicamente según paneles visibles
-    function ajustarGrid() {
-      const visor = document.querySelector('.visor');
-      const panelesVisibles = document.querySelectorAll('.cuadro:not(.hidden)').length;
-      
-      // Forzar 3x3 si hay 9 paneles visibles
-      if (panelesVisibles === 9) {
-        visor.style.gridTemplateColumns = 'repeat(3, 1fr)';
-        visor.style.gridTemplateRows = 'repeat(3, 1fr)';
-      } else if (panelesVisibles <= 1) {
-        visor.style.gridTemplateColumns = '1fr';
-        visor.style.gridTemplateRows = '1fr';
-      } else if (panelesVisibles <= 4) {
-        visor.style.gridTemplateColumns = 'repeat(2, 1fr)';
-        visor.style.gridTemplateRows = 'repeat(2, 1fr)';
-      } else if (panelesVisibles <= 6) {
-        visor.style.gridTemplateColumns = 'repeat(3, 1fr)';
-        visor.style.gridTemplateRows = 'repeat(2, 1fr)';
-      } else {
-        visor.style.gridTemplateColumns = 'repeat(3, 1fr)';
-        visor.style.gridTemplateRows = 'repeat(3, 1fr)';
-      }
-    }
-
-    // Actualizar contador de paneles visibles
-    function actualizarContador() {
-      const visibles = document.querySelectorAll('.cuadro:not(.hidden)').length;
-      document.getElementById('panelCounter').textContent = `${visibles} PANELES VISIBLES`;
-    }
-
-    // Manejo de errores en iframes
-    document.querySelectorAll('iframe').forEach(iframe => {
-      iframe.addEventListener('error', function() {
-        this.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#c8102e;font-weight:500;font-size:0.85rem;">⚠️ MÓDULO NO DISPONIBLE</div>';
-      });
-    });
-
-    // Inicializar
-    actualizarContador();
-    ajustarGrid();
-
-    // Ajustar grid al redimensionar ventana
-    window.addEventListener('resize', ajustarGrid);
   </script>
-
 </body>
 </html>
