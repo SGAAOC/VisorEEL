@@ -29,7 +29,7 @@
       flex-direction: column;
     }
 
-    /* ===== HEADER MEJORADO ===== */
+    /* ===== HEADER ===== */
     .header {
       background: linear-gradient(135deg, var(--essalud-blue) 0%, var(--essalud-blue-dark) 50%, #002a5c 100%);
       padding: 0 24px;
@@ -47,161 +47,90 @@
     .header::before {
       content: '';
       position: absolute;
-      top: 0;
-      left: 0;
-      right: 0;
-      bottom: 0;
+      top: 0; left: 0; right: 0; bottom: 0;
       background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
       animation: shimmer 3s infinite;
     }
 
     @keyframes shimmer {
-      0% { transform: translateX(-100%); }
+      0%   { transform: translateX(-100%); }
       100% { transform: translateX(100%); }
     }
 
     .header h1 {
-      font-size: 1.5rem;
-      font-weight: 900;
-      color: white;
-      letter-spacing: 1px;
-      text-transform: uppercase;
-      text-shadow: 0 2px 4px rgba(0,0,0,0.3);
-      z-index: 1;
+      font-size: 1.5rem; font-weight: 900; color: white;
+      letter-spacing: 1px; text-transform: uppercase;
+      text-shadow: 0 2px 4px rgba(0,0,0,0.3); z-index: 1;
     }
 
     .header-subtitle {
-      font-size: 0.7rem;
-      color: rgba(255,255,255,0.9);
-      font-weight: 400;
-      letter-spacing: 1px;
-      z-index: 1;
-      max-width: 600px;
+      font-size: 0.7rem; color: rgba(255,255,255,0.9);
+      font-weight: 400; letter-spacing: 1px; z-index: 1; max-width: 600px;
     }
 
     .header-info {
-      display: flex;
-      align-items: center;
-      gap: 24px;
-      z-index: 1;
+      display: flex; align-items: center; gap: 24px; z-index: 1;
     }
 
-    /* STATUS BADGE MEJORADO */
     .status-badge {
       background: rgba(0, 212, 122, 0.15);
-      padding: 10px 24px;
-      border-radius: 25px;
-      font-size: 0.85rem;
-      color: var(--live-green);
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      border: 2px solid var(--live-green);
-      font-weight: 700;
-      text-transform: uppercase;
-      letter-spacing: 1.5px;
+      padding: 10px 24px; border-radius: 25px; font-size: 0.85rem;
+      color: var(--live-green); display: flex; align-items: center; gap: 12px;
+      border: 2px solid var(--live-green); font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.5px;
       backdrop-filter: blur(10px);
       box-shadow: 0 0 20px rgba(0, 212, 122, 0.3);
       animation: borderGlow 2s ease-in-out infinite;
     }
 
     .status-badge::before {
-      content: "";
-      width: 10px;
-      height: 10px;
-      background: var(--live-green);
-      border-radius: 50%;
+      content: ""; width: 10px; height: 10px;
+      background: var(--live-green); border-radius: 50%;
       animation: pulse 1.5s ease-out infinite;
-      box-shadow: 0 0 0 0 rgba(0, 212, 122, 0.7);
     }
 
     @keyframes borderGlow {
-      0%, 100% { 
-        box-shadow: 0 0 20px rgba(0, 212, 122, 0.3);
-        border-color: var(--live-green);
-      }
-      50% { 
-        box-shadow: 0 0 30px rgba(0, 212, 122, 0.5);
-        border-color: #00ff88;
-      }
+      0%, 100% { box-shadow: 0 0 20px rgba(0, 212, 122, 0.3); border-color: var(--live-green); }
+      50%       { box-shadow: 0 0 30px rgba(0, 212, 122, 0.5); border-color: #00ff88; }
     }
 
     @keyframes pulse {
-      0% { 
-        transform: scale(1);
-        opacity: 1;
-        box-shadow: 0 0 0 0 rgba(0, 212, 122, 0.7);
-      }
-      50% { 
-        transform: scale(1.2);
-        opacity: 0.8;
-        box-shadow: 0 0 0 10px rgba(0, 212, 122, 0);
-      }
-      100% { 
-        transform: scale(1);
-        opacity: 1;
-        box-shadow: 0 0 0 0 rgba(0, 212, 122, 0.7);
-      }
+      0%   { transform: scale(1);   opacity: 1;   box-shadow: 0 0 0 0 rgba(0, 212, 122, 0.7); }
+      50%  { transform: scale(1.2); opacity: 0.8; box-shadow: 0 0 0 10px rgba(0, 212, 122, 0); }
+      100% { transform: scale(1);   opacity: 1;   box-shadow: 0 0 0 0 rgba(0, 212, 122, 0.7); }
     }
 
-    /* DATETIME BADGE */
     .datetime-badge {
       background: rgba(0, 61, 130, 0.6);
-      padding: 8px 20px;
-      border-radius: 8px;
-      color: white;
-      display: flex;
-      flex-direction: column;
-      align-items: flex-end;
-      gap: 2px;
-      border: 1px solid rgba(255,255,255,0.2);
-      min-width: 180px;
+      padding: 8px 20px; border-radius: 8px; color: white;
+      display: flex; flex-direction: column; align-items: flex-end; gap: 2px;
+      border: 1px solid rgba(255,255,255,0.2); min-width: 180px;
     }
 
     .datetime-badge .time {
-      font-size: 1.4rem;
-      font-weight: 900;
-      line-height: 1;
-      letter-spacing: 2px;
-      font-variant-numeric: tabular-nums;
+      font-size: 1.4rem; font-weight: 900; line-height: 1;
+      letter-spacing: 2px; font-variant-numeric: tabular-nums;
       text-shadow: 0 2px 4px rgba(0,0,0,0.3);
     }
 
     .datetime-badge .date {
-      font-size: 0.75rem;
-      font-weight: 600;
-      opacity: 0.95;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      font-size: 0.75rem; font-weight: 600; opacity: 0.95;
+      text-transform: uppercase; letter-spacing: 1px;
     }
 
-    /* ===== BOTONES DE CONTROL ===== */
+    /* ===== CONTROLES ===== */
     .controls {
-      padding: 12px 24px;
-      background: white;
+      padding: 12px 24px; background: white;
       border-bottom: 2px solid #d0d8e0;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      gap: 16px;
-      box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+      display: flex; justify-content: space-between; align-items: center;
+      gap: 16px; box-shadow: 0 2px 8px rgba(0,0,0,0.05);
     }
 
     .btn-control {
-      padding: 10px 20px;
-      background: var(--essalud-blue);
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-size: 0.85rem;
-      font-weight: 700;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      transition: var(--transition);
-      text-transform: uppercase;
-      letter-spacing: 0.5px;
+      padding: 10px 20px; background: var(--essalud-blue); color: white;
+      border: none; border-radius: 6px; font-size: 0.85rem; font-weight: 700;
+      cursor: pointer; display: flex; align-items: center; gap: 8px;
+      transition: var(--transition); text-transform: uppercase; letter-spacing: 0.5px;
       box-shadow: 0 2px 8px rgba(0, 86, 179, 0.3);
     }
 
@@ -217,48 +146,32 @@
       color: var(--essalud-blue);
     }
 
-    .btn-outline:hover {
-      background: var(--essalud-blue-light);
-    }
+    .btn-outline:hover { background: var(--essalud-blue-light); }
 
     .panel-counter {
-      font-size: 0.9rem;
-      color: var(--essalud-text);
-      font-weight: 700;
-      background: var(--essalud-blue-light);
-      padding: 8px 16px;
-      border-radius: 6px;
-      border-left: 4px solid var(--essalud-blue);
+      font-size: 0.9rem; color: var(--essalud-text); font-weight: 700;
+      background: var(--essalud-blue-light); padding: 8px 16px;
+      border-radius: 6px; border-left: 4px solid var(--essalud-blue);
     }
 
-    /* ===== GRID DE VISORES ADAPTATIVO ===== */
+    /* ===== GRID ===== */
     .visor-container {
-      flex: 1;
-      padding: 12px;
-      overflow: hidden;
-      background: #e8ecf1;
+      flex: 1; padding: 12px; overflow: hidden; background: #e8ecf1;
     }
 
     .visor {
       display: grid;
       grid-template-columns: repeat(3, 1fr);
       grid-template-rows: repeat(3, 1fr);
-      gap: 12px;
-      height: 100%;
-      width: 100%;
+      gap: 12px; height: 100%; width: 100%;
     }
 
     .cuadro {
-      background: white;
-      border-radius: 8px;
-      border: 2px solid #d0d8e0;
-      display: flex;
-      flex-direction: column;
-      overflow: hidden;
-      transition: var(--transition);
+      background: white; border-radius: 8px;
+      border: 2px solid #d0d8e0; display: flex; flex-direction: column;
+      overflow: hidden; transition: var(--transition);
       box-shadow: 0 2px 8px rgba(0, 86, 179, 0.1);
-      position: relative;
-      min-height: 0;
+      position: relative; min-height: 0;
     }
 
     .cuadro.hidden { display: none; }
@@ -266,196 +179,283 @@
     .cuadro:hover {
       border-color: var(--essalud-blue);
       box-shadow: 0 8px 24px rgba(0, 86, 179, 0.25);
-      z-index: 10;
-      transform: translateY(-2px);
+      z-index: 10; transform: translateY(-2px);
     }
 
     .cuadro::before {
-      content: "";
-      position: absolute;
-      top: 0; left: 0; right: 0;
-      height: 3px;
+      content: ""; position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
       background: linear-gradient(90deg, var(--essalud-blue), var(--essalud-red));
-      opacity: 0;
-      transition: var(--transition);
+      opacity: 0; transition: var(--transition);
     }
 
     .cuadro:hover::before { opacity: 1; }
 
     .titulo-panel {
       background: linear-gradient(135deg, var(--essalud-blue-light), white);
-      padding: 10px 16px;
-      font-weight: 700;
-      font-size: 0.8rem;
-      text-align: center;
-      color: var(--essalud-blue-dark);
+      padding: 10px 16px; font-weight: 700; font-size: 0.8rem;
+      text-align: center; color: var(--essalud-blue-dark);
       border-bottom: 2px solid #d0d8e0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 8px;
-      min-height: 44px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      min-height: 44px; white-space: nowrap; overflow: hidden;
+      text-overflow: ellipsis; text-transform: uppercase; letter-spacing: 1px;
       position: relative;
     }
 
     .panel-actions {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      display: flex;
-      gap: 6px;
-      opacity: 0;
-      transition: var(--transition);
+      position: absolute; right: 10px; top: 50%; transform: translateY(-50%);
+      display: flex; gap: 6px; opacity: 0; transition: var(--transition);
     }
 
     .cuadro:hover .panel-actions { opacity: 1; }
 
     .btn-action-panel {
-      width: 28px;
-      height: 28px;
-      border: none;
-      border-radius: 6px;
-      cursor: pointer;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 1rem;
-      font-weight: 700;
-      line-height: 1;
-      transition: var(--transition);
-      color: white;
+      width: 28px; height: 28px; border: none; border-radius: 6px;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      font-size: 1rem; font-weight: 700; line-height: 1;
+      transition: var(--transition); color: white;
       box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
 
     .btn-maximize { background: var(--essalud-blue); }
-    .btn-maximize:hover {
-      background: var(--essalud-blue-dark);
-      transform: scale(1.15);
-    }
-
+    .btn-maximize:hover { background: var(--essalud-blue-dark); transform: scale(1.15); }
     .btn-close { background: var(--essalud-red); }
-    .btn-close:hover {
-      background: #a00d26;
-      transform: scale(1.15);
-    }
+    .btn-close:hover { background: #a00d26; transform: scale(1.15); }
 
     .icon-badge {
-      width: 28px;
-      height: 28px;
-      background: var(--essalud-blue);
-      color: white;
-      border-radius: 6px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      font-size: 0.85rem;
-      font-weight: 700;
-      flex-shrink: 0;
+      width: 28px; height: 28px; background: var(--essalud-blue);
+      color: white; border-radius: 6px; display: flex;
+      align-items: center; justify-content: center;
+      font-size: 0.85rem; font-weight: 700; flex-shrink: 0;
       box-shadow: 0 2px 6px rgba(0,0,0,0.2);
     }
 
-    /* Colores por panel - 8 paneles con colores distintivos */
-    .cuadro:nth-child(1) .icon-badge { background: #2196f3; }   /* Azul - Anulación */
-    .cuadro:nth-child(2) .icon-badge { background: #4caf50; }   /* Verde - Citas */
-    .cuadro:nth-child(3) .icon-badge { background: #9c27b0; }   /* Morado - Referencia */
-    .cuadro:nth-child(4) .icon-badge { background: #f44336; }   /* Rojo - Informe/Reclamos */
-    .cuadro:nth-child(5) .icon-badge { background: #ff9800; }   /* Naranja - Rebagliati */
-    .cuadro:nth-child(6) .icon-badge { background: #3f51b5; }   /* Índigo - Anexos */
-    .cuadro:nth-child(7) .icon-badge { background: #e91e63; }   /* Rosa - Intercultural */
-    .cuadro:nth-child(8) .icon-badge { background: #00bcd4; }   /* Cyan - Salientes */
+    .cuadro:nth-child(1) .icon-badge { background: #2196f3; }
+    .cuadro:nth-child(2) .icon-badge { background: #4caf50; }
+    .cuadro:nth-child(3) .icon-badge { background: #9c27b0; }
+    .cuadro:nth-child(4) .icon-badge { background: #f44336; }
+    .cuadro:nth-child(5) .icon-badge { background: #ff9800; }
+    .cuadro:nth-child(6) .icon-badge { background: #3f51b5; }
+    .cuadro:nth-child(7) .icon-badge { background: #e91e63; }
+    .cuadro:nth-child(8) .icon-badge { background: #00bcd4; }
 
-    .contenido-iframe {
-      flex: 1;
-      position: relative;
-      overflow: hidden;
-      background: #fafbfc;
-      min-height: 0;
-    }
+    .contenido-iframe { flex: 1; position: relative; overflow: hidden; background: #fafbfc; min-height: 0; }
 
-    iframe {
-      width: 100%;
-      height: 100%;
-      border: none;
-      display: block;
-      background: white;
-    }
+    iframe { width: 100%; height: 100%; border: none; display: block; background: white; }
 
     /* ===== RESPONSIVE ===== */
     @media (max-width: 1400px) {
-      .visor {
-        grid-template-columns: repeat(2, 1fr);
-        grid-template-rows: repeat(4, 1fr);
-      }
+      .visor { grid-template-columns: repeat(2, 1fr); grid-template-rows: repeat(4, 1fr); }
     }
 
     @media (max-width: 900px) {
-      .header {
-        height: auto;
-        padding: 12px 16px;
-        flex-direction: column;
-        gap: 12px;
-      }
+      .header { height: auto; padding: 12px 16px; flex-direction: column; gap: 12px; }
       .header h1 { font-size: 1.2rem; }
-      .header-subtitle { 
-        font-size: 0.65rem;
-        max-width: 100%;
-        text-align: center;
-      }
-      .header-info {
-        width: 100%;
-        justify-content: space-between;
-      }
-      .datetime-badge {
-        min-width: auto;
-        flex: 1;
-        text-align: center;
-        align-items: center;
-      }
-      .controls {
-        flex-direction: column;
-        padding: 12px 16px;
-        gap: 12px;
-      }
-      .visor {
-        grid-template-columns: 1fr;
-        grid-template-rows: repeat(8, auto);
-      }
-      .visor-container {
-        padding: 8px;
-        overflow-y: auto;
-      }
-      body {
-        overflow-y: auto;
-        height: auto;
-        min-height: 100vh;
-      }
+      .header-subtitle { font-size: 0.65rem; max-width: 100%; text-align: center; }
+      .header-info { width: 100%; justify-content: space-between; }
+      .datetime-badge { min-width: auto; flex: 1; text-align: center; align-items: center; }
+      .controls { flex-direction: column; padding: 12px 16px; gap: 12px; }
+      .visor { grid-template-columns: 1fr; grid-template-rows: repeat(8, auto); }
+      .visor-container { padding: 8px; overflow-y: auto; }
+      body { overflow-y: auto; height: auto; min-height: 100vh; }
       .cuadro { min-height: 300px; }
     }
 
     /* ===== ANIMACIONES DE ENTRADA ===== */
     @keyframes slideIn {
       from { opacity: 0; transform: translateY(20px) scale(0.95); }
-      to { opacity: 1; transform: translateY(0) scale(1); }
+      to   { opacity: 1; transform: translateY(0) scale(1); }
     }
 
-    .cuadro {
-      animation: slideIn 0.4s ease forwards;
-      opacity: 0;
-    }
+    .cuadro { animation: slideIn 0.4s ease forwards; opacity: 0; }
     .cuadro:nth-child(1) { animation-delay: 0.05s; }
-    .cuadro:nth-child(2) { animation-delay: 0.1s; }
+    .cuadro:nth-child(2) { animation-delay: 0.10s; }
     .cuadro:nth-child(3) { animation-delay: 0.15s; }
-    .cuadro:nth-child(4) { animation-delay: 0.2s; }
+    .cuadro:nth-child(4) { animation-delay: 0.20s; }
     .cuadro:nth-child(5) { animation-delay: 0.25s; }
-    .cuadro:nth-child(6) { animation-delay: 0.3s; }
+    .cuadro:nth-child(6) { animation-delay: 0.30s; }
     .cuadro:nth-child(7) { animation-delay: 0.35s; }
-    .cuadro:nth-child(8) { animation-delay: 0.4s; }
+    .cuadro:nth-child(8) { animation-delay: 0.40s; }
+
+    /* ============================================================
+       OVERLAY — Capa de monitoreo en tiempo real
+       ============================================================ */
+    #overlay-panel {
+      position: fixed;
+      right: 20px;
+      bottom: 20px;
+      width: 350px;
+      z-index: 9999;
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+      font-family: 'Roboto', 'Segoe UI', sans-serif;
+      border: 2px solid var(--essalud-blue);
+      background: white;
+      transition: box-shadow 0.2s;
+      user-select: none;
+    }
+
+    #overlay-panel.ov-dragging {
+      box-shadow: 0 20px 60px rgba(0, 0, 0, 0.55);
+      cursor: grabbing !important;
+    }
+
+    /* --- Cabecera arrastrable --- */
+    #overlay-drag-handle {
+      background: linear-gradient(135deg, var(--essalud-blue) 0%, var(--essalud-blue-dark) 100%);
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      cursor: grab;
+      border-bottom: 3px solid var(--essalud-red);
+      min-height: 46px;
+    }
+
+    #overlay-drag-handle:active { cursor: grabbing; }
+
+    .ov-header-left {
+      display: flex; align-items: center; gap: 10px;
+    }
+
+    .ov-indicator {
+      width: 10px; height: 10px; border-radius: 50%;
+      background: var(--live-green); flex-shrink: 0;
+      animation: ov-pulse 2s ease-in-out infinite;
+    }
+
+    .ov-indicator.ov-error   { background: #c8102e; animation: none; }
+    .ov-indicator.ov-loading { background: #ffc107; animation: ov-pulse 0.8s ease-in-out infinite; }
+
+    @keyframes ov-pulse {
+      0%, 100% { opacity: 1; transform: scale(1); }
+      50%       { opacity: 0.45; transform: scale(0.75); }
+    }
+
+    .ov-header-title {
+      color: white; font-size: 0.73rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 1.2px;
+    }
+
+    .ov-header-btns {
+      display: flex; gap: 5px;
+    }
+
+    .ov-btn {
+      width: 26px; height: 26px;
+      border: 1px solid rgba(255,255,255,0.3);
+      border-radius: 5px;
+      background: rgba(255,255,255,0.12);
+      color: white; cursor: pointer;
+      font-size: 0.9rem; font-weight: 700;
+      display: flex; align-items: center; justify-content: center;
+      transition: background 0.2s; line-height: 1;
+    }
+
+    .ov-btn:hover { background: rgba(255,255,255,0.28); }
+
+    /* --- Cuerpo --- */
+    #overlay-body {
+      background: #f8fafd;
+    }
+
+    /* KPIs */
+    .ov-kpis {
+      display: flex; gap: 8px; padding: 12px 14px 10px;
+    }
+
+    .ov-kpi {
+      flex: 1; background: white; border-radius: 8px;
+      padding: 10px 6px; text-align: center;
+      border: 1px solid #d0d8e0; position: relative; overflow: hidden;
+    }
+
+    .ov-kpi::before {
+      content: ''; position: absolute;
+      top: 0; left: 0; right: 0; height: 3px;
+    }
+
+    .ov-kpi-cola::before   { background: var(--essalud-red); }
+    .ov-kpi-ocup::before   { background: #ff9800; }
+    .ov-kpi-disp::before   { background: var(--live-green); }
+
+    .ov-kpi-value {
+      font-size: 1.65rem; font-weight: 900; line-height: 1;
+      margin-bottom: 5px; font-variant-numeric: tabular-nums;
+      transition: color 0.3s;
+    }
+
+    .ov-kpi-cola .ov-kpi-value { color: var(--essalud-red); }
+    .ov-kpi-ocup .ov-kpi-value { color: #e65100; }
+    .ov-kpi-disp .ov-kpi-value { color: #1b7a47; }
+
+    .ov-kpi-value.ov-alert-flash {
+      animation: ov-flash 0.6s ease-in-out infinite alternate;
+    }
+
+    @keyframes ov-flash {
+      from { opacity: 1; }
+      to   { opacity: 0.3; }
+    }
+
+    .ov-kpi-label {
+      font-size: 0.58rem; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 0.8px; color: #777;
+    }
+
+    /* Tabla detalle */
+    #overlay-table-wrap {
+      max-height: 0; overflow: hidden;
+      transition: max-height 0.35s ease;
+      padding: 0 14px;
+    }
+
+    #overlay-table-wrap.ov-open {
+      max-height: 380px;
+      padding: 0 14px 10px;
+    }
+
+    .ov-table {
+      width: 100%; border-collapse: collapse; font-size: 0.71rem;
+    }
+
+    .ov-table th {
+      background: var(--essalud-blue); color: white;
+      padding: 5px 6px; text-align: center;
+      font-weight: 700; font-size: 0.63rem;
+      text-transform: uppercase; letter-spacing: 0.5px;
+    }
+
+    .ov-table th:first-child { text-align: left; }
+
+    .ov-table td {
+      padding: 5px 6px; border-bottom: 1px solid #e8ecf0;
+      text-align: center; color: #333;
+    }
+
+    .ov-table td:first-child { text-align: left; font-weight: 500; }
+    .ov-table tr:nth-child(even) td { background: #f5f7fa; }
+    .ov-table tr:hover td { background: var(--essalud-blue-light); }
+    .ov-td-alerta { color: var(--essalud-red) !important; font-weight: 900 !important; }
+
+    /* Footer de estado */
+    .ov-footer {
+      padding: 6px 14px 10px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-size: 0.64rem;
+      color: #999;
+      border-top: 1px solid #e8ecf0;
+    }
+
+    .ov-st-ok      { color: #1b7a47 !important; font-weight: 700 !important; }
+    .ov-st-error   { color: var(--essalud-red) !important; font-weight: 700 !important; }
+    .ov-st-loading { color: #e65100 !important; font-weight: 700 !important; }
+
+    /* Minimizado */
+    #overlay-panel.ov-minimized #overlay-body { display: none; }
   </style>
 </head>
 <body>
@@ -484,7 +484,7 @@
   <!-- Contenedor de visores -->
   <div class="visor-container">
     <div class="visor">
-      
+
       <!-- PANEL 1: OPCIÓN 0 - ANULACIÓN DE CITAS -->
       <div class="cuadro" id="panel-1" data-src="http://172.20.60.10:8080/TContactaUno/faces/queues/MonitoreoPerl.xhtml">
         <div class="titulo-panel">
@@ -608,83 +608,266 @@
     </div>
   </div>
 
+  <!-- ============================================================
+       OVERLAY — Capa de monitoreo en tiempo real
+       Requiere: python visor_proxy.py corriendo en background
+       ============================================================ -->
+  <div id="overlay-panel">
+    <div id="overlay-drag-handle">
+      <div class="ov-header-left">
+        <span class="ov-indicator ov-loading" id="ov-indicator"></span>
+        <span class="ov-header-title">Datos en Tiempo Real</span>
+      </div>
+      <div class="ov-header-btns">
+        <button class="ov-btn" id="ov-btn-table"   onclick="ovToggleTable()"    title="Ver por cola">▼</button>
+        <button class="ov-btn" id="ov-btn-minimize" onclick="ovToggleMinimize()" title="Minimizar">－</button>
+      </div>
+    </div>
+
+    <div id="overlay-body">
+      <!-- KPIs globales -->
+      <div class="ov-kpis">
+        <div class="ov-kpi ov-kpi-cola">
+          <div class="ov-kpi-value" id="ov-val-cola">–</div>
+          <div class="ov-kpi-label">En Cola</div>
+        </div>
+        <div class="ov-kpi ov-kpi-ocup">
+          <div class="ov-kpi-value" id="ov-val-ocup">–</div>
+          <div class="ov-kpi-label">Ocupados</div>
+        </div>
+        <div class="ov-kpi ov-kpi-disp">
+          <div class="ov-kpi-value" id="ov-val-disp">–</div>
+          <div class="ov-kpi-label">Disponibles</div>
+        </div>
+      </div>
+
+      <!-- Tabla detalle por cola -->
+      <div id="overlay-table-wrap">
+        <table class="ov-table">
+          <thead>
+            <tr>
+              <th>Cola</th>
+              <th>En Cola</th>
+              <th>Ocup.</th>
+              <th>Disp.</th>
+            </tr>
+          </thead>
+          <tbody id="ov-tabla-body">
+            <tr><td colspan="4" style="text-align:center;color:#999;padding:10px;">Sin datos</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Pie de estado -->
+      <div class="ov-footer">
+        <span id="ov-status-text" class="ov-st-loading">Iniciando proxy...</span>
+        <span id="ov-last-update"></span>
+      </div>
+    </div>
+  </div>
+
   <script>
-    // ===== ACTUALIZACIÓN DE FECHA Y HORA =====
+    // ===== FECHA Y HORA =====
     function updateDateTime() {
       const now = new Date();
-      const timeOptions = { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false };
-      const dateOptions = { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' };
-      
-      document.getElementById('currentTime').textContent = now.toLocaleTimeString('es-PE', timeOptions);
-      document.getElementById('currentDate').textContent = now.toLocaleDateString('es-PE', dateOptions).toUpperCase();
+      document.getElementById('currentTime').textContent =
+        now.toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
+      document.getElementById('currentDate').textContent =
+        now.toLocaleDateString('es-PE', { weekday: 'short', year: 'numeric', month: 'short', day: '2-digit' }).toUpperCase();
     }
-    
     updateDateTime();
     setInterval(updateDateTime, 1000);
 
     // ===== FUNCIONES DE PANEL =====
-    function ocultarPanel(numero) {
-      const panel = document.getElementById(`panel-${numero}`);
-      if (panel) {
-        panel.classList.add('hidden');
-        actualizarContador();
-        ajustarGrid();
-      }
+    function ocultarPanel(num) {
+      const p = document.getElementById(`panel-${num}`);
+      if (p) { p.classList.add('hidden'); actualizarContador(); ajustarGrid(); }
     }
 
-    function maximizarPanel(numero) {
-      const panel = document.getElementById(`panel-${numero}`);
-      if (panel) {
-        const url = panel.getAttribute('data-src');
-        window.open(url, `_blank_panel_${numero}`, 'noopener,noreferrer,width=1200,height=800');
+    function maximizarPanel(num) {
+      const p = document.getElementById(`panel-${num}`);
+      if (p) {
+        const url = p.getAttribute('data-src');
+        window.open(url, `_blank_panel_${num}`, 'noopener,noreferrer,width=1200,height=800');
       }
     }
 
     function restaurarTodo() {
       for (let i = 1; i <= 8; i++) {
-        const panel = document.getElementById(`panel-${i}`);
-        if (panel) panel.classList.remove('hidden');
+        const p = document.getElementById(`panel-${i}`);
+        if (p) p.classList.remove('hidden');
       }
       actualizarContador();
       ajustarGrid();
     }
 
-    // ===== AJUSTE DINÁMICO DEL GRID =====
     function ajustarGrid() {
       const visor = document.querySelector('.visor');
-      const panelesVisibles = document.querySelectorAll('.cuadro:not(.hidden)').length;
-      
-      if (panelesVisibles >= 7) {
-        visor.style.gridTemplateColumns = 'repeat(3, 1fr)';
-        visor.style.gridTemplateRows = 'repeat(3, 1fr)';
-      } else if (panelesVisibles >= 5) {
-        visor.style.gridTemplateColumns = 'repeat(3, 1fr)';
-        visor.style.gridTemplateRows = 'repeat(2, 1fr)';
-      } else if (panelesVisibles >= 3) {
-        visor.style.gridTemplateColumns = 'repeat(2, 1fr)';
-        visor.style.gridTemplateRows = 'repeat(2, 1fr)';
-      } else {
-        visor.style.gridTemplateColumns = '1fr';
-        visor.style.gridTemplateRows = 'repeat(' + panelesVisibles + ', 1fr)';
-      }
+      const n = document.querySelectorAll('.cuadro:not(.hidden)').length;
+      if (n >= 7)      { visor.style.gridTemplateColumns = 'repeat(3, 1fr)'; visor.style.gridTemplateRows = 'repeat(3, 1fr)'; }
+      else if (n >= 5) { visor.style.gridTemplateColumns = 'repeat(3, 1fr)'; visor.style.gridTemplateRows = 'repeat(2, 1fr)'; }
+      else if (n >= 3) { visor.style.gridTemplateColumns = 'repeat(2, 1fr)'; visor.style.gridTemplateRows = 'repeat(2, 1fr)'; }
+      else             { visor.style.gridTemplateColumns = '1fr'; visor.style.gridTemplateRows = `repeat(${n}, 1fr)`; }
     }
 
     function actualizarContador() {
-      const visibles = document.querySelectorAll('.cuadro:not(.hidden)').length;
-      document.getElementById('panelCounter').textContent = `${visibles} PANELES VISIBLES`;
+      const v = document.querySelectorAll('.cuadro:not(.hidden)').length;
+      document.getElementById('panelCounter').textContent = `${v} PANELES VISIBLES`;
     }
 
-    // ===== MANEJO DE ERRORES EN IFRAMES =====
     document.querySelectorAll('iframe').forEach(iframe => {
-      iframe.addEventListener('error', function() {
-        this.parentElement.innerHTML = '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#c8102e;font-weight:600;font-size:0.9rem;">⚠️ MÓDULO NO DISPONIBLE</div>';
+      iframe.addEventListener('error', function () {
+        this.parentElement.innerHTML =
+          '<div style="display:flex;align-items:center;justify-content:center;height:100%;color:#c8102e;font-weight:600;font-size:0.9rem;">⚠️ MÓDULO NO DISPONIBLE</div>';
       });
     });
 
-    // ===== INICIALIZACIÓN =====
     actualizarContador();
     ajustarGrid();
     window.addEventListener('resize', ajustarGrid);
+
+    // =================================================================
+    //  OVERLAY — Capa de monitoreo en tiempo real
+    // =================================================================
+    const OV_PROXY = 'http://172.20.60.86:5051/api/queues';
+    const OV_INTERVAL_MS = 8000;
+
+    let ovMinimized = false;
+    let ovTableOpen = false;
+    let ovDragging  = false;
+    let ovOffsetX   = 0;
+    let ovOffsetY   = 0;
+
+    const ovPanel  = document.getElementById('overlay-panel');
+    const ovHandle = document.getElementById('overlay-drag-handle');
+
+    // --- Drag ---
+    ovHandle.addEventListener('mousedown', function (e) {
+      if (e.target.closest('.ov-btn')) return;
+      ovDragging = true;
+      const rect = ovPanel.getBoundingClientRect();
+      ovOffsetX  = e.clientX - rect.left;
+      ovOffsetY  = e.clientY - rect.top;
+      ovPanel.classList.add('ov-dragging');
+      // Fijar posición absoluta desde esquina superior-izquierda
+      ovPanel.style.right  = 'auto';
+      ovPanel.style.bottom = 'auto';
+      ovPanel.style.left   = rect.left + 'px';
+      ovPanel.style.top    = rect.top  + 'px';
+      e.preventDefault();
+    });
+
+    document.addEventListener('mousemove', function (e) {
+      if (!ovDragging) return;
+      const maxX = window.innerWidth  - ovPanel.offsetWidth;
+      const maxY = window.innerHeight - ovPanel.offsetHeight;
+      ovPanel.style.left = Math.max(0, Math.min(maxX, e.clientX - ovOffsetX)) + 'px';
+      ovPanel.style.top  = Math.max(0, Math.min(maxY, e.clientY - ovOffsetY)) + 'px';
+    });
+
+    document.addEventListener('mouseup', function () {
+      ovDragging = false;
+      ovPanel.classList.remove('ov-dragging');
+    });
+
+    // --- Minimizar ---
+    function ovToggleMinimize() {
+      ovMinimized = !ovMinimized;
+      ovPanel.classList.toggle('ov-minimized', ovMinimized);
+      document.getElementById('ov-btn-minimize').textContent = ovMinimized ? '＋' : '－';
+    }
+
+    // --- Toggle tabla ---
+    function ovToggleTable() {
+      ovTableOpen = !ovTableOpen;
+      document.getElementById('overlay-table-wrap').classList.toggle('ov-open', ovTableOpen);
+      document.getElementById('ov-btn-table').textContent = ovTableOpen ? '▲' : '▼';
+    }
+
+    // --- Actualizar UI con datos del proxy ---
+    function ovUpdate(data) {
+      const indic    = document.getElementById('ov-indicator');
+      const statusEl = document.getElementById('ov-status-text');
+      const updateEl = document.getElementById('ov-last-update');
+
+      if (data.status === 'error') {
+        indic.className     = 'ov-indicator ov-error';
+        statusEl.className  = 'ov-st-error';
+        statusEl.textContent = '⚠ ' + (data.message || 'Error');
+        return;
+      }
+
+      if (data.status === 'loading') {
+        indic.className     = 'ov-indicator ov-loading';
+        statusEl.className  = 'ov-st-loading';
+        statusEl.textContent = 'Cargando datos...';
+        return;
+      }
+
+      // Datos OK
+      indic.className     = 'ov-indicator';
+      statusEl.className  = 'ov-st-ok';
+      statusEl.textContent = '✓ Conectado';
+      updateEl.textContent = data.ts || new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+
+      const colaEl = document.getElementById('ov-val-cola');
+      const ocupEl = document.getElementById('ov-val-ocup');
+      const dispEl = document.getElementById('ov-val-disp');
+
+      colaEl.textContent = data.total_cola        ?? '–';
+      ocupEl.textContent = data.total_ocupados    ?? '–';
+      dispEl.textContent = data.total_disponibles ?? '–';
+
+      // Parpadeo si hay llamadas en espera
+      colaEl.classList.toggle('ov-alert-flash', (data.total_cola || 0) > 0);
+
+      // Tabla por cola
+      const tbody = document.getElementById('ov-tabla-body');
+      if (data.paneles && data.paneles.length > 0) {
+        tbody.innerHTML = data.paneles.map(function (p) {
+          const nombre = p.nombre.includes(' - ') ? p.nombre.split(' - ').slice(1).join(' - ') : p.nombre;
+          return `<tr>
+            <td title="${p.nombre}">${nombre}</td>
+            <td class="${p.cola > 0 ? 'ov-td-alerta' : ''}">${p.cola}</td>
+            <td>${p.ocupados}</td>
+            <td>${p.desocupados}</td>
+          </tr>`;
+        }).join('');
+        document.getElementById('ov-btn-table').style.display = '';
+      } else {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#999;padding:8px;">Sin datos de colas</td></tr>';
+        document.getElementById('ov-btn-table').style.display = 'none';
+      }
+    }
+
+    // --- Fetch al proxy local ---
+    async function ovFetch() {
+      const controller = new AbortController();
+      const tid = setTimeout(function () { controller.abort(); }, 5000);
+      try {
+        const resp = await fetch(OV_PROXY, { signal: controller.signal });
+        clearTimeout(tid);
+        if (!resp.ok) throw new Error('HTTP ' + resp.status);
+        const data = await resp.json();
+        ovUpdate(data);
+      } catch (err) {
+        clearTimeout(tid);
+        const isNetwork = err.name === 'AbortError'
+          || err.message.includes('Failed to fetch')
+          || err.message.includes('NetworkError')
+          || err.message.includes('fetch');
+        ovUpdate({
+          status: 'error',
+          message: isNetwork
+            ? 'Ejecutar: python visor_proxy.py'
+            : err.message
+        });
+      }
+    }
+
+    // Arrancar overlay
+    ovFetch();
+    setInterval(ovFetch, OV_INTERVAL_MS);
   </script>
 
 </body>
