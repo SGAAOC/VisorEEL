@@ -281,10 +281,13 @@
        OVERLAY — Capa de monitoreo en tiempo real
        ============================================================ */
     #overlay-panel {
+      --ov-ui-scale: 1;
       position: fixed;
       right: 20px;
       bottom: 20px;
-      width: 350px;
+      width: clamp(340px, 28vw, 760px);
+      min-width: 300px;
+      max-width: 96vw;
       z-index: 9999;
       border-radius: 12px;
       overflow: hidden;
@@ -294,6 +297,13 @@
       background: white;
       transition: box-shadow 0.2s;
       user-select: none;
+      min-height: 120px;
+      max-height: 92vh;
+    }
+
+    #overlay-scale-root {
+      width: 100%;
+      min-height: 100%;
     }
 
     #overlay-panel.ov-dragging {
@@ -304,13 +314,14 @@
     /* --- Cabecera arrastrable --- */
     #overlay-drag-handle {
       background: linear-gradient(135deg, var(--essalud-blue) 0%, var(--essalud-blue-dark) 100%);
-      padding: 10px 14px;
+      padding: calc(10px * var(--ov-ui-scale)) calc(14px * var(--ov-ui-scale));
       display: flex;
       align-items: center;
       justify-content: space-between;
       cursor: grab;
       border-bottom: 3px solid var(--essalud-red);
-      min-height: 46px;
+      min-height: calc(46px * var(--ov-ui-scale));
+      touch-action: none;
     }
 
     #overlay-drag-handle:active { cursor: grabbing; }
@@ -334,7 +345,7 @@
     }
 
     .ov-header-title {
-      color: white; font-size: 0.73rem; font-weight: 700;
+      color: white; font-size: calc(0.73rem * var(--ov-ui-scale)); font-weight: 700;
       text-transform: uppercase; letter-spacing: 1.2px;
     }
 
@@ -343,12 +354,12 @@
     }
 
     .ov-btn {
-      width: 26px; height: 26px;
+      width: calc(26px * var(--ov-ui-scale)); height: calc(26px * var(--ov-ui-scale));
       border: 1px solid rgba(255,255,255,0.3);
       border-radius: 5px;
       background: rgba(255,255,255,0.12);
       color: white; cursor: pointer;
-      font-size: 0.9rem; font-weight: 700;
+      font-size: calc(0.9rem * var(--ov-ui-scale)); font-weight: 700;
       display: flex; align-items: center; justify-content: center;
       transition: background 0.2s; line-height: 1;
     }
@@ -362,12 +373,12 @@
 
     /* KPIs */
     .ov-kpis {
-      display: flex; gap: 8px; padding: 12px 14px 10px;
+      display: flex; gap: calc(8px * var(--ov-ui-scale)); padding: calc(12px * var(--ov-ui-scale)) calc(14px * var(--ov-ui-scale)) calc(10px * var(--ov-ui-scale));
     }
 
     .ov-kpi {
       flex: 1; background: white; border-radius: 8px;
-      padding: 10px 6px; text-align: center;
+      padding: calc(10px * var(--ov-ui-scale)) calc(6px * var(--ov-ui-scale)); text-align: center;
       border: 1px solid #d0d8e0; position: relative; overflow: hidden;
     }
 
@@ -381,14 +392,22 @@
     .ov-kpi-disp::before   { background: var(--live-green); }
 
     .ov-kpi-value {
-      font-size: 1.65rem; font-weight: 900; line-height: 1;
-      margin-bottom: 5px; font-variant-numeric: tabular-nums;
+      font-size: calc(1.65rem * var(--ov-ui-scale)); font-weight: 900; line-height: 1;
+      margin-bottom: calc(5px * var(--ov-ui-scale)); font-variant-numeric: tabular-nums;
       transition: color 0.3s;
     }
 
     .ov-kpi-cola .ov-kpi-value { color: var(--essalud-red); }
     .ov-kpi-ocup .ov-kpi-value { color: #e65100; }
     .ov-kpi-disp .ov-kpi-value { color: #1b7a47; }
+
+    .ov-kpi-cola.ov-level-ok::before   { background: #1b7a47; }
+    .ov-kpi-cola.ov-level-warn::before { background: #ff9800; }
+    .ov-kpi-cola.ov-level-crit::before { background: var(--essalud-red); }
+
+    .ov-kpi-cola.ov-level-ok .ov-kpi-value   { color: #1b7a47; }
+    .ov-kpi-cola.ov-level-warn .ov-kpi-value { color: #e65100; }
+    .ov-kpi-cola.ov-level-crit .ov-kpi-value { color: var(--essalud-red); }
 
     .ov-kpi-value.ov-alert-flash {
       animation: ov-flash 0.6s ease-in-out infinite alternate;
@@ -400,37 +419,92 @@
     }
 
     .ov-kpi-label {
-      font-size: 0.58rem; font-weight: 700;
+      font-size: calc(0.58rem * var(--ov-ui-scale)); font-weight: 700;
       text-transform: uppercase; letter-spacing: 0.8px; color: #777;
+    }
+
+    .ov-mood {
+      margin: 0 calc(14px * var(--ov-ui-scale)) calc(8px * var(--ov-ui-scale));
+      padding: calc(7px * var(--ov-ui-scale)) calc(10px * var(--ov-ui-scale));
+      border-radius: 8px;
+      font-size: calc(0.68rem * var(--ov-ui-scale));
+      font-weight: 800;
+      letter-spacing: 0.4px;
+      border: 1px solid transparent;
+      transition: all 0.2s ease;
+      text-transform: uppercase;
+    }
+
+    .ov-mood-emoji {
+      margin-right: calc(6px * var(--ov-ui-scale));
+      font-size: calc(0.9rem * var(--ov-ui-scale));
+      vertical-align: middle;
+    }
+
+    .ov-mood-trend {
+      margin-left: calc(6px * var(--ov-ui-scale));
+      font-size: calc(0.72rem * var(--ov-ui-scale));
+      font-weight: 900;
+      opacity: 0.9;
+    }
+
+    .ov-mood-ok {
+      background: #eaf8f1;
+      color: #146c43;
+      border-color: #b9e6cf;
+    }
+
+    .ov-mood-warn {
+      background: #fff5e6;
+      color: #8a4b00;
+      border-color: #ffd59b;
+    }
+
+    .ov-mood-crit {
+      background: #ffe9ec;
+      color: #8f0e25;
+      border-color: #ffb3bf;
+    }
+
+    .ov-mood-loading {
+      background: #fff8e1;
+      color: #8c6500;
+      border-color: #ffe08a;
+    }
+
+    .ov-mood-error {
+      background: #ffe5ea;
+      color: #a00d26;
+      border-color: #ffadb9;
     }
 
     /* Tabla detalle */
     #overlay-table-wrap {
       max-height: 0; overflow: hidden;
       transition: max-height 0.35s ease;
-      padding: 0 14px;
+      padding: 0 calc(14px * var(--ov-ui-scale));
     }
 
     #overlay-table-wrap.ov-open {
-      max-height: 380px;
-      padding: 0 14px 10px;
+      max-height: min(55vh, 460px);
+      padding: 0 calc(14px * var(--ov-ui-scale)) calc(10px * var(--ov-ui-scale));
     }
 
     .ov-table {
-      width: 100%; border-collapse: collapse; font-size: 0.71rem;
+      width: 100%; border-collapse: collapse; font-size: calc(0.71rem * var(--ov-ui-scale));
     }
 
     .ov-table th {
       background: var(--essalud-blue); color: white;
-      padding: 5px 6px; text-align: center;
-      font-weight: 700; font-size: 0.63rem;
+      padding: calc(5px * var(--ov-ui-scale)) calc(6px * var(--ov-ui-scale)); text-align: center;
+      font-weight: 700; font-size: calc(0.63rem * var(--ov-ui-scale));
       text-transform: uppercase; letter-spacing: 0.5px;
     }
 
     .ov-table th:first-child { text-align: left; }
 
     .ov-table td {
-      padding: 5px 6px; border-bottom: 1px solid #e8ecf0;
+      padding: calc(5px * var(--ov-ui-scale)) calc(6px * var(--ov-ui-scale)); border-bottom: 1px solid #e8ecf0;
       text-align: center; color: #333;
     }
 
@@ -438,24 +512,58 @@
     .ov-table tr:nth-child(even) td { background: #f5f7fa; }
     .ov-table tr:hover td { background: var(--essalud-blue-light); }
     .ov-td-alerta { color: var(--essalud-red) !important; font-weight: 900 !important; }
+    .ov-row-warn td { background: #fff6e8 !important; }
+    .ov-row-crit td { background: #ffe9ec !important; }
 
     /* Footer de estado */
     .ov-footer {
-      padding: 6px 14px 10px;
+      padding: calc(6px * var(--ov-ui-scale)) calc(14px * var(--ov-ui-scale)) calc(10px * var(--ov-ui-scale));
       display: flex;
-      justify-content: space-between;
+      justify-content: flex-end;
       align-items: center;
-      font-size: 0.64rem;
+      font-size: calc(0.64rem * var(--ov-ui-scale));
       color: #999;
       border-top: 1px solid #e8ecf0;
     }
 
+    #ov-resize-grip {
+      position: absolute;
+      right: 4px;
+      bottom: 4px;
+      width: 16px;
+      height: 16px;
+      cursor: nwse-resize;
+      z-index: 10010;
+      touch-action: none;
+      background:
+        linear-gradient(135deg, transparent 0 35%, rgba(0,0,0,0.35) 35% 45%, transparent 45% 60%, rgba(0,0,0,0.35) 60% 70%, transparent 70% 100%);
+      border-radius: 2px;
+      opacity: 0.7;
+    }
+
+    #ov-resize-grip:hover { opacity: 1; }
+
+    #ov-status-text { display: none; }
+
     .ov-st-ok      { color: #1b7a47 !important; font-weight: 700 !important; }
+    .ov-st-warn    { color: #ad5b00 !important; font-weight: 700 !important; }
+    .ov-st-crit    { color: #a00d26 !important; font-weight: 900 !important; }
     .ov-st-error   { color: var(--essalud-red) !important; font-weight: 700 !important; }
     .ov-st-loading { color: #e65100 !important; font-weight: 700 !important; }
 
     /* Minimizado */
     #overlay-panel.ov-minimized #overlay-body { display: none; }
+
+    @media (max-width: 700px) {
+      #overlay-panel {
+        right: 8px;
+        bottom: 8px;
+        left: auto;
+        width: min(420px, calc(100vw - 16px));
+        min-width: 0;
+        resize: none;
+      }
+    }
   </style>
 </head>
 <body>
@@ -613,12 +721,14 @@
        Requiere: python visor_proxy.py corriendo en background
        ============================================================ -->
   <div id="overlay-panel">
+    <div id="overlay-scale-root">
     <div id="overlay-drag-handle">
       <div class="ov-header-left">
         <span class="ov-indicator ov-loading" id="ov-indicator"></span>
         <span class="ov-header-title">Datos en Tiempo Real</span>
       </div>
       <div class="ov-header-btns">
+        <button class="ov-btn" id="ov-btn-zoom" onclick="ovToggleZoom()" title="Aumentar panel">⛶</button>
         <button class="ov-btn" id="ov-btn-table"   onclick="ovToggleTable()"    title="Ver por cola">▼</button>
         <button class="ov-btn" id="ov-btn-minimize" onclick="ovToggleMinimize()" title="Minimizar">－</button>
       </div>
@@ -641,6 +751,8 @@
         </div>
       </div>
 
+      <div id="ov-mood" class="ov-mood ov-mood-loading">⏳ Evaluando colas...</div>
+
       <!-- Tabla detalle por cola -->
       <div id="overlay-table-wrap">
         <table class="ov-table">
@@ -661,9 +773,10 @@
       <!-- Pie de estado -->
       <div class="ov-footer">
         <span id="ov-status-text" class="ov-st-loading">Iniciando proxy...</span>
-        <span id="ov-last-update"></span>
       </div>
     </div>
+    </div>
+    <div id="ov-resize-grip" title="Redimensionar"></div>
   </div>
 
   <script>
@@ -730,51 +843,206 @@
     //  OVERLAY — Capa de monitoreo en tiempo real
     // =================================================================
     const OV_PROXY = 'http://172.20.60.86:5051/api/queues';
-    const OV_INTERVAL_MS = 8000;
+    const OV_INTERVAL_MS = 1000;
+    const OV_SEMAFORO = {
+      warnQueue: 8,
+      critQueue: 15,
+      warnWaitSec: 120,
+      critWaitSec: 300,
+      alertEverySec: 120,
+    };
+    const OV_BASE_WIDTH = 360;
+    const OV_ZOOM_WIDTHS = [360, 520, 700, 900];
 
     let ovMinimized = false;
     let ovTableOpen = false;
     let ovDragging  = false;
+    let ovResizing  = false;
     let ovOffsetX   = 0;
     let ovOffsetY   = 0;
+    let ovResizeStartX = 0;
+    let ovResizeStartY = 0;
+    let ovResizeStartW = 0;
+    let ovResizeStartH = 0;
+    let ovLastAlertAt = 0;
+    let ovFetchInFlight = false;
+    let ovZoomStep = 0;
+    let ovLastTotalCola = null;
+    let ovMoodTick = 0;
+    let ovMoodLastSwitchAt = 0;
+    let ovMoodLastKind = 'loading';
+    const OV_MOOD_ROTATE_SEC = 15;
+    const OV_MOOD_FAST_DROP_DELTA = 6;
+    const ovQueueState = {};
 
     const ovPanel  = document.getElementById('overlay-panel');
     const ovHandle = document.getElementById('overlay-drag-handle');
+    const ovResizeGrip = document.getElementById('ov-resize-grip');
+    const ovZoomBtn = document.getElementById('ov-btn-zoom');
+
+    function ovUpdateZoomButton() {
+      if (!ovZoomBtn) return;
+      if (ovZoomStep <= 0) {
+        ovZoomBtn.textContent = '↗';
+        ovZoomBtn.title = 'Zoom minimo (clic para aumentar)';
+      } else if (ovZoomStep >= OV_ZOOM_WIDTHS.length - 1) {
+        ovZoomBtn.textContent = '↙';
+        ovZoomBtn.title = 'Zoom maximo (clic para reiniciar)';
+      } else {
+        ovZoomBtn.textContent = '⤢';
+        ovZoomBtn.title = 'Zoom intermedio';
+      }
+    }
+
+    function ovSyncZoomStepFromWidth() {
+      const w = ovPanel.clientWidth || OV_BASE_WIDTH;
+      let nearest = 0;
+      let nearestDiff = Number.POSITIVE_INFINITY;
+      for (let i = 0; i < OV_ZOOM_WIDTHS.length; i++) {
+        const diff = Math.abs(OV_ZOOM_WIDTHS[i] - w);
+        if (diff < nearestDiff) {
+          nearest = i;
+          nearestDiff = diff;
+        }
+      }
+      ovZoomStep = nearest;
+      ovUpdateZoomButton();
+    }
+
+    function ovApplyPanelScale() {
+      const width = ovPanel.clientWidth || 360;
+      const scale = Math.max(1, Math.min(1.6, width / 360));
+      ovPanel.style.setProperty('--ov-ui-scale', scale.toFixed(3));
+      ovSyncZoomStepFromWidth();
+    }
+
+    function ovClampPanelToViewport() {
+      const rect = ovPanel.getBoundingClientRect();
+      if (ovPanel.style.left) {
+        const maxLeft = Math.max(0, window.innerWidth - ovPanel.offsetWidth);
+        const maxTop = Math.max(0, window.innerHeight - ovPanel.offsetHeight);
+        const left = Math.max(0, Math.min(maxLeft, rect.left));
+        const top = Math.max(0, Math.min(maxTop, rect.top));
+        ovPanel.style.left = left + 'px';
+        ovPanel.style.top = top + 'px';
+      }
+    }
+
+    function ovGetPointerPoint(e) {
+      if (e.touches && e.touches.length > 0) return e.touches[0];
+      if (e.changedTouches && e.changedTouches.length > 0) return e.changedTouches[0];
+      return e;
+    }
+
+    function ovStartDragAt(clientX, clientY) {
+      ovDragging = true;
+      const rect = ovPanel.getBoundingClientRect();
+      ovOffsetX = clientX - rect.left;
+      ovOffsetY = clientY - rect.top;
+      ovPanel.classList.add('ov-dragging');
+      ovPanel.style.right = 'auto';
+      ovPanel.style.bottom = 'auto';
+      ovPanel.style.left = rect.left + 'px';
+      ovPanel.style.top = rect.top + 'px';
+    }
+
+    function ovStartResizeAt(clientX, clientY) {
+      ovResizing = true;
+      ovResizeStartX = clientX;
+      ovResizeStartY = clientY;
+      ovResizeStartW = ovPanel.offsetWidth;
+      ovResizeStartH = ovPanel.offsetHeight;
+    }
+
+    function ovHandlePointerMove(clientX, clientY) {
+      if (ovResizing) {
+        const minW = 320;
+        const minH = 140;
+        const maxW = Math.max(minW, window.innerWidth - 10);
+        const maxH = Math.max(minH, window.innerHeight - 10);
+        const w = Math.max(minW, Math.min(maxW, ovResizeStartW + (clientX - ovResizeStartX)));
+        const h = Math.max(minH, Math.min(maxH, ovResizeStartH + (clientY - ovResizeStartY)));
+        ovPanel.style.width = w + 'px';
+        ovPanel.style.height = h + 'px';
+        ovApplyPanelScale();
+        return;
+      }
+      if (!ovDragging) return;
+      const maxX = window.innerWidth - ovPanel.offsetWidth;
+      const maxY = window.innerHeight - ovPanel.offsetHeight;
+      ovPanel.style.left = Math.max(0, Math.min(maxX, clientX - ovOffsetX)) + 'px';
+      ovPanel.style.top = Math.max(0, Math.min(maxY, clientY - ovOffsetY)) + 'px';
+    }
 
     // --- Drag ---
     ovHandle.addEventListener('mousedown', function (e) {
       if (e.target.closest('.ov-btn')) return;
-      ovDragging = true;
-      const rect = ovPanel.getBoundingClientRect();
-      ovOffsetX  = e.clientX - rect.left;
-      ovOffsetY  = e.clientY - rect.top;
-      ovPanel.classList.add('ov-dragging');
-      // Fijar posición absoluta desde esquina superior-izquierda
-      ovPanel.style.right  = 'auto';
-      ovPanel.style.bottom = 'auto';
-      ovPanel.style.left   = rect.left + 'px';
-      ovPanel.style.top    = rect.top  + 'px';
+      ovStartDragAt(e.clientX, e.clientY);
       e.preventDefault();
     });
 
+    ovHandle.addEventListener('touchstart', function (e) {
+      if (e.target.closest('.ov-btn')) return;
+      const p = ovGetPointerPoint(e);
+      ovStartDragAt(p.clientX, p.clientY);
+      e.preventDefault();
+    }, { passive: false });
+
     document.addEventListener('mousemove', function (e) {
-      if (!ovDragging) return;
-      const maxX = window.innerWidth  - ovPanel.offsetWidth;
-      const maxY = window.innerHeight - ovPanel.offsetHeight;
-      ovPanel.style.left = Math.max(0, Math.min(maxX, e.clientX - ovOffsetX)) + 'px';
-      ovPanel.style.top  = Math.max(0, Math.min(maxY, e.clientY - ovOffsetY)) + 'px';
+      ovHandlePointerMove(e.clientX, e.clientY);
     });
+
+    document.addEventListener('touchmove', function (e) {
+      if (!ovDragging && !ovResizing) return;
+      const p = ovGetPointerPoint(e);
+      ovHandlePointerMove(p.clientX, p.clientY);
+      e.preventDefault();
+    }, { passive: false });
 
     document.addEventListener('mouseup', function () {
       ovDragging = false;
+      ovResizing = false;
       ovPanel.classList.remove('ov-dragging');
     });
+
+    document.addEventListener('touchend', function () {
+      ovDragging = false;
+      ovResizing = false;
+      ovPanel.classList.remove('ov-dragging');
+    });
+
+    ovResizeGrip.addEventListener('mousedown', function (e) {
+      ovStartResizeAt(e.clientX, e.clientY);
+      e.preventDefault();
+      e.stopPropagation();
+    });
+
+    ovResizeGrip.addEventListener('touchstart', function (e) {
+      const p = ovGetPointerPoint(e);
+      ovStartResizeAt(p.clientX, p.clientY);
+      e.preventDefault();
+      e.stopPropagation();
+    }, { passive: false });
 
     // --- Minimizar ---
     function ovToggleMinimize() {
       ovMinimized = !ovMinimized;
       ovPanel.classList.toggle('ov-minimized', ovMinimized);
       document.getElementById('ov-btn-minimize').textContent = ovMinimized ? '＋' : '－';
+    }
+
+    function ovToggleZoom() {
+      ovZoomStep = (ovZoomStep + 1) % OV_ZOOM_WIDTHS.length;
+      const targetW = Math.min(OV_ZOOM_WIDTHS[ovZoomStep], Math.max(320, window.innerWidth - 16));
+      ovPanel.style.width = targetW + 'px';
+      ovPanel.style.height = '';
+      ovApplyPanelScale();
+      ovClampPanelToViewport();
+      ovUpdateZoomButton();
+    }
+
+    function ovUpdateScale() {
+      // Sin escalado interno: el panel crece de forma nativa con su ancho.
     }
 
     // --- Toggle tabla ---
@@ -784,16 +1052,110 @@
       document.getElementById('ov-btn-table').textContent = ovTableOpen ? '▲' : '▼';
     }
 
+    function ovGetLevel(cola, waitSec) {
+      if (cola >= OV_SEMAFORO.critQueue || waitSec >= OV_SEMAFORO.critWaitSec) return 'crit';
+      if (cola >= OV_SEMAFORO.warnQueue || waitSec >= OV_SEMAFORO.warnWaitSec) return 'warn';
+      return 'ok';
+    }
+
+    function ovLevelRank(level) {
+      if (level === 'crit') return 2;
+      if (level === 'warn') return 1;
+      return 0;
+    }
+
+    function ovFormatWait(waitSec) {
+      if (!waitSec) return '0m';
+      const mins = Math.floor(waitSec / 60);
+      const secs = waitSec % 60;
+      if (mins >= 60) {
+        const hours = Math.floor(mins / 60);
+        return `${hours}h ${String(mins % 60).padStart(2, '0')}m`;
+      }
+      if (mins > 0) return `${mins}m ${String(secs).padStart(2, '0')}s`;
+      return `${secs}s`;
+    }
+
+    function ovPlayAlertTone(level) {
+      if (!window.AudioContext && !window.webkitAudioContext) return;
+      const Ctx = window.AudioContext || window.webkitAudioContext;
+      const ctx = new Ctx();
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.value = level === 'crit' ? 920 : 720;
+      gain.gain.value = 0.0001;
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      const t0 = ctx.currentTime;
+      gain.gain.exponentialRampToValueAtTime(0.12, t0 + 0.03);
+      gain.gain.exponentialRampToValueAtTime(0.0001, t0 + 0.30);
+      osc.start(t0);
+      osc.stop(t0 + 0.30);
+    }
+
+    function ovMaybeNotify(level, message) {
+      if (level === 'ok') return;
+      const now = Date.now();
+      if (now - ovLastAlertAt < OV_SEMAFORO.alertEverySec * 1000) return;
+      ovLastAlertAt = now;
+
+      ovPlayAlertTone(level);
+      if ('Notification' in window && Notification.permission === 'granted') {
+        try {
+          new Notification('Alerta de Cola', { body: message });
+        } catch (e) {
+          // Ignorar errores de notificación.
+        }
+      }
+    }
+
+    function ovSetMood(kind, textOrList, trend, forceNow) {
+      const moodEl = document.getElementById('ov-mood');
+      if (!moodEl) return;
+
+      const pool = Array.isArray(textOrList) ? textOrList : [textOrList];
+      const now = Date.now();
+
+      if (kind !== ovMoodLastKind) {
+        ovMoodTick = 0;
+        ovMoodLastSwitchAt = now;
+        ovMoodLastKind = kind;
+      } else if (forceNow) {
+        ovMoodTick += 1;
+        ovMoodLastSwitchAt = now;
+      } else if (now - ovMoodLastSwitchAt >= OV_MOOD_ROTATE_SEC * 1000) {
+        ovMoodTick += 1;
+        ovMoodLastSwitchAt = now;
+      }
+
+      const idx = ovMoodTick % Math.max(1, pool.length);
+      const text = pool[idx] || '';
+
+      const emojiByKind = {
+        ok: '✅',
+        warn: '⚠',
+        crit: '🚨',
+        loading: '⏳',
+        error: '❌',
+      };
+      const emoji = emojiByKind[kind] || 'ℹ';
+      const trendText = trend ? `<span class="ov-mood-trend">${trend}</span>` : '';
+
+      moodEl.className = `ov-mood ov-mood-${kind}`;
+      moodEl.innerHTML = `<span class="ov-mood-emoji">${emoji}</span>${text}${trendText}`;
+    }
+
     // --- Actualizar UI con datos del proxy ---
     function ovUpdate(data) {
       const indic    = document.getElementById('ov-indicator');
       const statusEl = document.getElementById('ov-status-text');
-      const updateEl = document.getElementById('ov-last-update');
 
       if (data.status === 'error') {
         indic.className     = 'ov-indicator ov-error';
         statusEl.className  = 'ov-st-error';
         statusEl.textContent = '⚠ ' + (data.message || 'Error');
+        ovSetMood('error', '🚨 Sin conexion. Revisar proxy y reasignar agentes de respaldo');
         return;
       }
 
@@ -801,6 +1163,7 @@
         indic.className     = 'ov-indicator ov-loading';
         statusEl.className  = 'ov-st-loading';
         statusEl.textContent = 'Cargando datos...';
+        ovSetMood('loading', '⏳ Cargando estado operativo de colas...');
         return;
       }
 
@@ -808,11 +1171,25 @@
       indic.className     = 'ov-indicator';
       statusEl.className  = 'ov-st-ok';
       statusEl.textContent = '✓ Conectado';
-      updateEl.textContent = data.ts || new Date().toLocaleTimeString('es-PE', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
 
       const colaEl = document.getElementById('ov-val-cola');
       const ocupEl = document.getElementById('ov-val-ocup');
       const dispEl = document.getElementById('ov-val-disp');
+      const colaKpiEl = colaEl.closest('.ov-kpi-cola');
+      const currentTotalCola = Number(data.total_cola || 0);
+
+      let trend = '→ ESTABLE';
+      let forceMoodNow = false;
+      if (ovLastTotalCola !== null) {
+        const deltaCola = currentTotalCola - ovLastTotalCola;
+        if (currentTotalCola > ovLastTotalCola) trend = '↑ SUBIENDO';
+        else if (currentTotalCola < ovLastTotalCola) trend = '↓ BAJANDO';
+        if (deltaCola <= -OV_MOOD_FAST_DROP_DELTA) {
+          trend = `↓↓ BAJA RAPIDA (${deltaCola})`;
+          forceMoodNow = true;
+        }
+      }
+      ovLastTotalCola = currentTotalCola;
 
       colaEl.textContent = data.total_cola        ?? '–';
       ocupEl.textContent = data.total_ocupados    ?? '–';
@@ -824,24 +1201,101 @@
       // Tabla por cola
       const tbody = document.getElementById('ov-tabla-body');
       if (data.paneles && data.paneles.length > 0) {
+        const nowSec = Math.floor(Date.now() / 1000);
+        let worstLevel = 'ok';
+        let worstPanelName = '';
+        let worstPanelWait = 0;
+        let worstPanelCola = 0;
+
         tbody.innerHTML = data.paneles.map(function (p) {
           const nombre = p.nombre.includes(' - ') ? p.nombre.split(' - ').slice(1).join(' - ') : p.nombre;
-          return `<tr>
+          const colaCount = Number(p.cola || 0);
+          const panelKey = p.nombre || nombre;
+          const panelId = Number(p.panel_id);
+
+          if (colaCount > 0) {
+            if (!ovQueueState[panelKey]) ovQueueState[panelKey] = { since: nowSec };
+          } else {
+            delete ovQueueState[panelKey];
+          }
+
+          const waitSec = colaCount > 0 && ovQueueState[panelKey]
+            ? Math.max(0, nowSec - ovQueueState[panelKey].since)
+            : 0;
+
+          const level = ovGetLevel(colaCount, waitSec);
+          if (ovLevelRank(level) > ovLevelRank(worstLevel)) {
+            worstLevel = level;
+            worstPanelName = nombre;
+            worstPanelWait = waitSec;
+            worstPanelCola = colaCount;
+          }
+
+          const rowClass = level === 'crit' ? 'ov-row-crit' : (level === 'warn' ? 'ov-row-warn' : '');
+          return `<tr class="${rowClass}">
             <td title="${p.nombre}">${nombre}</td>
             <td class="${p.cola > 0 ? 'ov-td-alerta' : ''}">${p.cola}</td>
             <td>${p.ocupados}</td>
             <td>${p.desocupados}</td>
+
           </tr>`;
         }).join('');
+
+        colaKpiEl.classList.remove('ov-level-ok', 'ov-level-warn', 'ov-level-crit');
+        colaKpiEl.classList.add(
+          worstLevel === 'crit' ? 'ov-level-crit' : (worstLevel === 'warn' ? 'ov-level-warn' : 'ov-level-ok')
+        );
+
+        if (worstLevel === 'crit') {
+          statusEl.className = 'ov-st-crit';
+          statusEl.textContent = `ROJO: ${worstPanelName} con ${worstPanelCola} en cola (${ovFormatWait(worstPanelWait)})`;
+          ovSetMood('crit', [
+            `Accion inmediata: reforzar ${worstPanelName}`,
+            `Prioridad alta: bajar ${worstPanelCola} en cola`,
+            `Mover apoyo ahora a ${worstPanelName}`,
+          ], trend, forceMoodNow);
+        } else if (worstLevel === 'warn') {
+          statusEl.className = 'ov-st-warn';
+          statusEl.textContent = `AMARILLO: ${worstPanelName} en seguimiento (${ovFormatWait(worstPanelWait)})`;
+          ovSetMood('warn', [
+            `Atencion: apoyar ${worstPanelName}`,
+            `Prevenir escalada en ${worstPanelName}`,
+            `Ajustar agentes para evitar pico`,
+          ], trend, forceMoodNow);
+        } else {
+          statusEl.className = 'ov-st-ok';
+          statusEl.textContent = 'VERDE: Operación estable';
+          ovSetMood('ok', [
+            'Buen ritmo: mantener dotacion actual',
+            'Operacion estable: sostener nivel de servicio',
+            'Sin presion: monitoreo preventivo activo',
+          ], trend, forceMoodNow);
+        }
+
+        ovMaybeNotify(
+          worstLevel,
+          worstLevel === 'crit'
+            ? `${worstPanelName}: ${worstPanelCola} en cola durante ${ovFormatWait(worstPanelWait)}`
+            : `${worstPanelName}: cola en aumento (${ovFormatWait(worstPanelWait)})`
+        );
+
         document.getElementById('ov-btn-table').style.display = '';
       } else {
         tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#999;padding:8px;">Sin datos de colas</td></tr>';
+        colaKpiEl.classList.remove('ov-level-warn', 'ov-level-crit');
+        colaKpiEl.classList.add('ov-level-ok');
+        statusEl.className = 'ov-st-loading';
+        statusEl.textContent = 'Sin datos de colas';
         document.getElementById('ov-btn-table').style.display = 'none';
+        ovSetMood('loading', 'ℹ Sin datos por cola en este momento');
       }
     }
 
     // --- Fetch al proxy local ---
     async function ovFetch() {
+      if (ovFetchInFlight) return;
+      ovFetchInFlight = true;
+
       const controller = new AbortController();
       const tid = setTimeout(function () { controller.abort(); }, 5000);
       try {
@@ -862,10 +1316,25 @@
             ? 'Ejecutar: python visor_proxy.py'
             : err.message
         });
+      } finally {
+        ovFetchInFlight = false;
       }
     }
 
     // Arrancar overlay
+    ovApplyPanelScale();
+    window.addEventListener('resize', function () {
+      ovClampPanelToViewport();
+      ovApplyPanelScale();
+    });
+
+    if ('Notification' in window && Notification.permission === 'default') {
+      document.addEventListener('click', function askNotifPermOnce() {
+        Notification.requestPermission().catch(function () {});
+        document.removeEventListener('click', askNotifPermOnce);
+      });
+    }
+
     ovFetch();
     setInterval(ovFetch, OV_INTERVAL_MS);
   </script>
