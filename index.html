@@ -890,7 +890,7 @@
       alertEverySec: 120,
     };
     const OV_ENABLE_BROWSER_NOTIFICATIONS = false;
-    const OV_VOICE_ENABLED_DEFAULT = true;
+    const OV_VOICE_ENABLED_DEFAULT = false;
     const OV_VOICE_INTERVAL_SEC = 180;
     const OV_VOICE_LANG = 'es-PE';
     const OV_VOICE_RATE = 1.0;
@@ -946,17 +946,20 @@
       const voices = window.speechSynthesis.getVoices() || [];
       if (!voices.length) return null;
 
+      const femaleHints = /(female|woman|mujer|paulina|sofia|monica|helena|maria|lucia|espa[nñ]ol|google uk english female)/i;
+      
       const preferred = voices.filter(function (v) {
         const lang = String(v.lang || '').toLowerCase();
         return lang.startsWith('es');
       });
-      const pool = preferred.length ? preferred : voices;
-
-      const femaleHints = /(female|mujer|paulina|sofia|monica|helena|maria|lucia|espa[nñ]ol)/i;
-      const exact = pool.find(function (v) { return femaleHints.test(String(v.name || '')); });
-      if (exact) return exact;
-
-      return pool[0] || null;
+      const femaleSpanish = preferred.filter(function (v) { return femaleHints.test(String(v.name || '')); });
+      if (femaleSpanish.length) return femaleSpanish[0];
+      if (preferred.length) return preferred[0];
+      
+      const femaleAll = voices.filter(function (v) { return femaleHints.test(String(v.name || '')); });
+      if (femaleAll.length) return femaleAll[0];
+      
+      return voices[0] || null;
     }
 
     function ovInitVoices() {
@@ -1201,16 +1204,13 @@
 
     function ovBuildVoiceMessage(level, focusName, focusCola, focusWait, topQueues) {
       const cleanName = String(focusName || '').replaceAll('"', '');
-      const list = (topQueues || []).filter(q => Number(q.cola || 0) > 0).slice(0, 3);
-      const listText = list.length
-        ? `Resumen: ${list.map(q => `${q.nombre} ${Number(q.cola)}`).join(', ')}.`
-        : '';
+      const waitText = ovFormatVoiceWait(focusWait);
 
       if (level === 'crit') {
-        return `Alerta critica en ${cleanName}. ${focusCola} pendientes. Espera ${ovFormatVoiceWait(focusWait)}. Sugerencia: reforzar agentes de inmediato. ${listText}`;
+        return `Alerta critica en ${cleanName}. ${focusCola} pendientes, espera ${waitText}.`;
       }
       if (level === 'warn') {
-        return `Atencion en ${cleanName}. ${focusCola} pendientes. Sugerencia: aplicar refuerzo preventivo. ${listText}`;
+        return `Atencion en ${cleanName}. ${focusCola} pendientes.`;
       }
       return '';
     }
