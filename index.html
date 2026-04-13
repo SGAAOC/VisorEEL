@@ -893,8 +893,8 @@
     const OV_VOICE_ENABLED_DEFAULT = false;
     const OV_VOICE_INTERVAL_SEC = 60;
     const OV_VOICE_LANG = 'es-PE';
-    const OV_VOICE_RATE = 1.0;
-    const OV_VOICE_PITCH = 1.0;
+    const OV_VOICE_RATE = 1.1;
+    const OV_VOICE_PITCH = 1.3;
     const OV_VOICE_VOLUME = 1.0;
     const OV_VOICE_TRANSITION_ONLY = true;
     // Si defines esta URL (proxy propio), se usa voz cloud estable.
@@ -1264,7 +1264,17 @@
       utterance.pitch = OV_VOICE_PITCH;
       utterance.volume = OV_VOICE_VOLUME;
       if (!ovVoicesReady) ovInitVoices();
-      if (ovPreferredFemaleVoice) utterance.voice = ovPreferredFemaleVoice;
+      
+      // Try preferred voice first, otherwise search for female voice in real-time
+      let selectedVoice = ovPreferredFemaleVoice;
+      if (!selectedVoice) {
+        const voices = window.speechSynthesis.getVoices() || [];
+        const femaleHints = /(female|woman|mujer|paulina|sofia|monica|helena|maria|lucia|espa[nñ]ol|carmen|conchita|rosa|ana|female spanish)/i;
+        const byGender = voices.filter(function(v) { return v.gender === 'female'; });
+        selectedVoice = byGender.length ? byGender[0] : voices.find(function(v) { return femaleHints.test(String(v.name || '')); });
+      }
+      if (selectedVoice) utterance.voice = selectedVoice;
+      
       utterance.onstart = function () { ovSpeakingNow = true; };
       utterance.onend = function () { ovSpeakingNow = false; };
       utterance.onerror = function () { ovSpeakingNow = false; };
@@ -1288,6 +1298,8 @@
       if (!ovVoiceEnabled || !ovVoiceSupported()) return;
       if (!ovVoiceUnlocked) return;
       if (ovSpeakingNow) return;
+      // Only speak on warn or crit, skip ok
+      if (level === 'ok') return;
 
       const now = Date.now();
       const regularGap = OV_VOICE_INTERVAL_SEC * 1000;
@@ -1295,7 +1307,6 @@
       const topSig = (topQueues || []).slice(0, 3).map(q => `${q.nombre}:${q.cola}`).join('|');
       const signature = `${level}|${focusName}|${focusCola}|${Math.floor((focusWait || 0) / 30)}|${topSig}`;
 
-      if (OV_VOICE_TRANSITION_ONLY && level !== 'ok' && level === ovLastVoiceLevel && now - ovLastVoiceAt < minGap) return;
       if (signature === ovLastVoiceSignature && now - ovLastVoiceAt < minGap) return;
       if (now - ovLastVoiceAt < minGap && level === ovLastVoiceLevel) return;
 
