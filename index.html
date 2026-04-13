@@ -896,6 +896,10 @@
     const OV_VOICE_RATE = 1.1;
     const OV_VOICE_PITCH = 1.3;
     const OV_VOICE_VOLUME = 1.0;
+    const OV_VOICE_TRANSITION_ONLY = true;
+    // Si defines esta URL (proxy propio), se usa voz cloud estable.
+    // Debe aceptar POST JSON { text, lang, preferredGender } y responder audio (mp3/wav/ogg).
+    const OV_CLOUD_TTS_URL = '';
     const OV_BASE_WIDTH = 360;
     const OV_ZOOM_WIDTHS = [360, 520, 700, 900];
 
@@ -1221,35 +1225,14 @@
     function ovBuildVoiceMessage(level, focusName, focusCola, focusWait, topQueues) {
       const cleanName = String(focusName || '').replaceAll('"', '');
       const waitText = ovFormatVoiceWait(focusWait);
-      
-      // Primary: Focus on worst queue with full detail
-      let mainPart = '';
+
       if (level === 'crit') {
-        mainPart = `Alerta critica en ${cleanName}. ${focusCola} pendientes, espera ${waitText}.`;
-      } else if (level === 'warn') {
-        mainPart = `Atencion en ${cleanName}. ${focusCola} pendientes.`;
+        return `Alerta critica en ${cleanName}. ${focusCola} pendientes, espera ${waitText}.`;
       }
-      if (!mainPart) return '';
-      
-      // Secondary: Brief summary of other alert-level queues
-      const otherAlerts = (topQueues || [])
-        .filter(function(q) {
-          // Exclude the main focus and only include those in warn/crit
-          if (q.nombre === focusName) return false;
-          const qLevel = ovGetLevel(q.cola, q.wait_sec);
-          return qLevel === 'warn' || qLevel === 'crit';
-        })
-        .slice(0, 2); // Max 2 more queues
-      
-      let secondaryPart = '';
-      if (otherAlerts.length > 0) {
-        const briefList = otherAlerts.map(function(q) {
-          return `${q.nombre} ${q.cola}`;
-        }).join(', ');
-        secondaryPart = ` Tambien atencion en: ${briefList}.`;
+      if (level === 'warn') {
+        return `Atencion en ${cleanName}. ${focusCola} pendientes.`;
       }
-      
-      return mainPart + secondaryPart;
+      return '';
     }
 
     async function ovSpeakCloud(text) {
