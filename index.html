@@ -766,6 +766,7 @@
       </div>
       <div class="ov-header-btns">
         <button class="ov-btn" id="ov-btn-voice" onclick="ovToggleVoice()" title="Voz de alertas">🔊</button>
+        <button class="ov-btn" id="ov-btn-voice-test" onclick="ovTestVoice()" title="Probar voz" style="display:none;">🎙</button>
         <button class="ov-btn" id="ov-btn-zoom" onclick="ovToggleZoom()" title="Aumentar panel">⛶</button>
         <button class="ov-btn" id="ov-btn-table"   onclick="ovToggleTable()"    title="Ver detalle">▼</button>
       </div>
@@ -923,6 +924,7 @@
     let ovLastVoiceSignature = '';
     let ovLastVoiceLevel = 'ok';
     let ovSpeakingNow = false;
+    let ovVoiceUnlocked = false;
     let ovVoicesReady = false;
     let ovPreferredFemaleVoice = null;
     const OV_MOOD_ROTATE_SEC = 15;
@@ -991,7 +993,10 @@
       if (!ovVoiceEnabled) {
         try { window.speechSynthesis.cancel(); } catch (e) {}
         ovSpeakingNow = false;
+        return;
       }
+
+      ovTestVoice(true);
     }
 
     function ovUpdateZoomButton() {
@@ -1252,8 +1257,22 @@
       window.speechSynthesis.speak(utterance);
     }
 
+    function ovTestVoice(isFromToggle) {
+      if (!ovVoiceSupported()) return;
+      if (!ovVoiceEnabled && !isFromToggle) return;
+
+      const testMessage = 'Voz activa. Monitoreo operativo listo.';
+      ovVoiceUnlocked = true;
+      try {
+        ovSpeakLocal(testMessage);
+      } catch (e) {
+        // Ignorar errores de prueba.
+      }
+    }
+
     async function ovMaybeSpeak(level, focusName, focusCola, focusWait, topQueues) {
       if (!ovVoiceEnabled || !ovVoiceSupported()) return;
+      if (!ovVoiceUnlocked) return;
       if (ovSpeakingNow) return;
 
       const now = Date.now();
@@ -1587,6 +1606,12 @@
         ovVoicesReady = false;
         ovInitVoices();
       };
+
+      // Desbloquea audio/speech en la primera interacción del usuario.
+      document.addEventListener('click', function ovUnlockVoiceOnce() {
+        ovVoiceUnlocked = true;
+        document.removeEventListener('click', ovUnlockVoiceOnce);
+      }, { once: true });
     }
 
     ovUpdateVoiceButton();
