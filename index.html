@@ -946,27 +946,33 @@
       const voices = window.speechSynthesis.getVoices() || [];
       if (!voices.length) return null;
 
-      const femaleHints = /(female|woman|mujer|paulina|sofia|monica|helena|maria|lucia|espa[nñ]ol|google uk english female|carmen|conchita|rosa|ana|female spanish)/i;
+      // Named female voices (prioritized)
+      const targetNames = ['maria', 'susanda', 'cortana', 'victoria', 'samantha', 'karen', 'moira', 'zira', 'paulina', 'sofia', 'monica', 'helena', 'lucia', 'carmen', 'conchita', 'rosa', 'ana'];
+      const byTargetName = voices.find(function (v) {
+        const name = String(v.name || '').toLowerCase();
+        return targetNames.some(function(target) { return name.includes(target); });
+      });
+      if (byTargetName) return byTargetName;
       
-      // Prioridad 1: Voces en español con género femenino explícito o nombres femeninos
+      // Voces en español con género femenino
       const spanish = voices.filter(function (v) {
         const lang = String(v.lang || '').toLowerCase();
         return lang.startsWith('es');
       });
       
-      const femaleSpanish = spanish.filter(function (v) {
-        if (v.gender === 'female') return true;
-        return femaleHints.test(String(v.name || ''));
+      const spanishFemaleByGender = spanish.filter(function (v) {
+        return v.gender === 'female';
       });
-      if (femaleSpanish.length) return femaleSpanish[0];
+      if (spanishFemaleByGender.length) return spanishFemaleByGender[0];
       
-      // Prioridad 2: Cualquier voz con género femenino explícito
+      // Cualquier voz con gender === 'female'
       const anyFemaleByGender = voices.filter(function (v) {
         return v.gender === 'female';
       });
       if (anyFemaleByGender.length) return anyFemaleByGender[0];
       
-      // Prioridad 3: Voces con pistas femeninas en cualquier idioma
+      // Búsqueda por palabras clave femeninas
+      const femaleHints = /(female|woman|mujer|paulina|sofia|monica|helena|maria|lucia|susanda|cortana|victoria|karen|moira|zira|espa[nñ]ol|carmen|conchita|rosa|ana)/i;
       const femaleByName = voices.filter(function (v) {
         return femaleHints.test(String(v.name || ''));
       });
@@ -1265,15 +1271,33 @@
       utterance.volume = OV_VOICE_VOLUME;
       if (!ovVoicesReady) ovInitVoices();
       
-      // Try preferred voice first, otherwise search for female voice in real-time
-      let selectedVoice = ovPreferredFemaleVoice;
-      if (!selectedVoice) {
-        const voices = window.speechSynthesis.getVoices() || [];
-        const femaleHints = /(female|woman|mujer|paulina|sofia|monica|helena|maria|lucia|espa[nñ]ol|carmen|conchita|rosa|ana|female spanish)/i;
-        const byGender = voices.filter(function(v) { return v.gender === 'female'; });
-        selectedVoice = byGender.length ? byGender[0] : voices.find(function(v) { return femaleHints.test(String(v.name || '')); });
+      // Force female voice selection with multiple strategies
+      let selectedVoice = null;
+      const voices = window.speechSynthesis.getVoices() || [];
+      const targetNames = ['maria', 'susanda', 'cortana', 'victoria', 'samantha', 'karen', 'moira', 'zira', 'paulina', 'sofia'];
+      
+      // Strategy 1: Try cached preferred voice
+      if (ovPreferredFemaleVoice) {
+        selectedVoice = ovPreferredFemaleVoice;
       }
-      if (selectedVoice) utterance.voice = selectedVoice;
+      
+      // Strategy 2: Search for specific named voices
+      if (!selectedVoice && voices.length) {
+        selectedVoice = voices.find(function (v) {
+          const name = String(v.name || '').toLowerCase();
+          return targetNames.some(function(target) { return name.includes(target); });
+        });
+      }
+      
+      // Strategy 3: Force any female-gendered voice
+      if (!selectedVoice && voices.length) {
+        const femaleByGender = voices.filter(function(v) { return v.gender === 'female'; });
+        selectedVoice = femaleByGender[0] || null;
+      }
+      
+      if (selectedVoice) {
+        utterance.voice = selectedVoice;
+      }
       
       utterance.onstart = function () { ovSpeakingNow = true; };
       utterance.onend = function () { ovSpeakingNow = false; };
