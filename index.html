@@ -1220,13 +1220,26 @@
       const cleanName = String(focusName || '').replaceAll('"', '');
       const waitText = ovFormatVoiceWait(focusWait);
 
-      if (level === 'crit') {
-        return `Alerta critica en ${cleanName}. ${focusCola} pendientes, espera ${waitText}.`;
-      }
-      if (level === 'warn') {
-        return `Atencion en ${cleanName}. ${focusCola} pendientes.`;
-      }
-      return '';
+      if (level !== 'crit' && level !== 'warn') return '';
+
+      // FOCUS: siempre primero la peor cola, con mayor detalle.
+      const focusText = level === 'crit'
+        ? `Alerta critica en ${cleanName}. ${focusCola} pendientes, espera ${waitText}.`
+        : `Atencion en ${cleanName}. ${focusCola} pendientes, espera ${waitText}.`;
+
+      // Luego agrega otras colas en atencion de forma breve.
+      const secondary = (topQueues || [])
+        .filter(function (q) {
+          const qName = String(q.nombre || '').replaceAll('"', '');
+          return qName !== cleanName && (q.level === 'crit' || q.level === 'warn') && Number(q.cola || 0) > 0;
+        })
+        .slice(0, 3)
+        .map(function (q) {
+          return `${q.nombre} ${Number(q.cola)}`;
+        });
+
+      if (!secondary.length) return focusText;
+      return `${focusText} Tambien atencion en: ${secondary.join(', ')}.`;
     }
 
     async function ovSpeakCloud(text) {
