@@ -919,7 +919,7 @@
     let ovMoodTick = 0;
     let ovMoodLastSwitchAt = 0;
     let ovMoodLastKind = 'loading';
-    let ovVoiceEnabled = (localStorage.getItem('ovVoiceEnabled') ?? (OV_VOICE_ENABLED_DEFAULT ? '1' : '0')) === '1';
+    let ovVoiceEnabled = false;
     let ovLastVoiceAt = 0;
     let ovLastVoiceSignature = '';
     let ovLastVoiceLevel = 'ok';
