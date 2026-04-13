@@ -1118,19 +1118,22 @@
       }
 
       const idx = ovMoodTick % Math.max(1, pool.length);
-      const text = pool[idx] || '';
+      const item = pool[idx];
+      const isObj = item !== null && typeof item === 'object' && 'text' in item;
+      const activeKind = isObj ? (item.kind || kind) : kind;
+      const text = isObj ? (item.text || '') : (item || '');
 
       const emojiByKind = {
         ok: '✅',
-        warn: '⚠',
+        warn: '⚠️',
         crit: '🚨',
         loading: '⏳',
         error: '❌',
       };
-      const emoji = emojiByKind[kind] || 'ℹ';
+      const emoji = emojiByKind[activeKind] || 'ℹ️';
       const trendText = trend ? `<span class="ov-mood-trend">${trend}</span>` : '';
 
-      moodEl.className = `ov-mood ov-mood-${kind}`;
+      moodEl.className = `ov-mood ov-mood-${activeKind}`;
       moodEl.innerHTML = `<span class="ov-mood-emoji">${emoji}</span>${text}${trendText}`;
     }
 
@@ -1194,7 +1197,7 @@
         let worstPanelName = '';
         let worstPanelWait = 0;
         let worstPanelCola = 0;
-        const impactedQueues = [];
+        const allQueues = [];
 
         tbody.innerHTML = data.paneles.map(function (p) {
           const nombre = p.nombre.includes(' - ') ? p.nombre.split(' - ').slice(1).join(' - ') : p.nombre;
@@ -1220,14 +1223,12 @@
             worstPanelCola = colaCount;
           }
 
-          if (colaCount > 0 || level !== 'ok') {
-            impactedQueues.push({
-              nombre: nombre,
-              cola: colaCount,
-              waitSec: waitSec,
-              level: level,
-            });
-          }
+          allQueues.push({
+            nombre: nombre,
+            cola: colaCount,
+            waitSec: waitSec,
+            level: level,
+          });
 
           const rowClass = level === 'crit' ? 'ov-row-crit' : (level === 'warn' ? 'ov-row-warn' : '');
           return `<tr class="${rowClass}">
@@ -1244,7 +1245,7 @@
           worstLevel === 'crit' ? 'ov-level-crit' : (worstLevel === 'warn' ? 'ov-level-warn' : 'ov-level-ok')
         );
 
-        const topImpacted = impactedQueues
+        const topImpacted = allQueues
           .slice()
           .sort(function (a, b) {
             if (b.cola !== a.cola) return b.cola - a.cola;
@@ -1255,6 +1256,25 @@
         function ovFmtQueueName(name) {
           return `cola "${name}"`;
         }
+
+        // Rotar por TODAS las colas: las más críticas primero, luego las demás
+        const sortedAllQueues = allQueues.slice().sort(function (a, b) {
+          const ld = ovLevelRank(b.level) - ovLevelRank(a.level);
+          if (ld !== 0) return ld;
+          if (b.cola !== a.cola) return b.cola - a.cola;
+          return b.waitSec - a.waitSec;
+        });
+
+        const rotationPool = sortedAllQueues.map(function (q) {
+          const qName = ovFmtQueueName(q.nombre);
+          if (q.level === 'crit') {
+            return { kind: 'crit', text: `${qName}: REFORZAR AHORA — ${Number(q.cola)} en cola (${ovFormatWait(Number(q.waitSec))})` };
+          } else if (q.level === 'warn') {
+            return { kind: 'warn', text: `${qName}: ajustar dotacion — ${Number(q.cola)} en cola (${ovFormatWait(Number(q.waitSec))})` };
+          } else {
+            return { kind: 'ok', text: `${qName}: operacion normal — sin espera` };
+          }
+        });
 
         const focusQueue = topImpacted.length > 0 ? topImpacted[0] : {
           nombre: worstPanelName,
@@ -1269,27 +1289,15 @@
         if (worstLevel === 'crit') {
           statusEl.className = 'ov-st-crit';
           statusEl.textContent = `ROJO: ${focusName} con ${focusCola} en cola (${ovFormatWait(focusWait)})`;
-          ovSetMood('crit', [
-            `Accion inmediata: reforzar ${focusName}.`,
-            `Meta urgente: bajar ${focusName} (${focusCola} en cola).`,
-            `Derivar apoyo ya a ${focusName}.`,
-          ], trend, forceMoodNow);
+          ovSetMood('crit', rotationPool, trend, forceMoodNow);
         } else if (worstLevel === 'warn') {
           statusEl.className = 'ov-st-warn';
           statusEl.textContent = `AMARILLO: ${focusName} en seguimiento (${ovFormatWait(focusWait)})`;
-          ovSetMood('warn', [
-            `Atencion: apoyar ${focusName}.`,
-            `Prevenir escalada en ${focusName}.`,
-            `Ajustar agentes en ${focusName} antes de pico.`,
-          ], trend, forceMoodNow);
+          ovSetMood('warn', rotationPool, trend, forceMoodNow);
         } else {
           statusEl.className = 'ov-st-ok';
           statusEl.textContent = 'VERDE: Operación estable';
-          ovSetMood('ok', [
-            'Buen ritmo: mantener dotacion actual.',
-            'Operacion estable: sostener nivel de servicio.',
-            'Sin presion: monitoreo preventivo activo.',
-          ], trend, forceMoodNow);
+          ovSetMood('ok', rotationPool, trend, forceMoodNow);
         }
 
         ovMaybeNotify(
