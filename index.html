@@ -314,13 +314,13 @@
     /* --- Cabecera arrastrable --- */
     #overlay-drag-handle {
       background: linear-gradient(135deg, var(--essalud-blue) 0%, var(--essalud-blue-dark) 100%);
-      padding: calc(10px * var(--ov-ui-scale)) calc(14px * var(--ov-ui-scale));
+      padding: calc(6px * var(--ov-ui-scale)) calc(10px * var(--ov-ui-scale));
       display: flex;
       align-items: center;
       justify-content: space-between;
       cursor: grab;
       border-bottom: 3px solid var(--essalud-red);
-      min-height: calc(46px * var(--ov-ui-scale));
+      min-height: calc(36px * var(--ov-ui-scale));
       touch-action: none;
     }
 
@@ -551,9 +551,6 @@
     .ov-st-error   { color: var(--essalud-red) !important; font-weight: 700 !important; }
     .ov-st-loading { color: #e65100 !important; font-weight: 700 !important; }
 
-    /* Minimizado */
-    #overlay-panel.ov-minimized #overlay-body { display: none; }
-
     @media (max-width: 700px) {
       #overlay-panel {
         right: 8px;
@@ -730,7 +727,6 @@
       <div class="ov-header-btns">
         <button class="ov-btn" id="ov-btn-zoom" onclick="ovToggleZoom()" title="Aumentar panel">⛶</button>
         <button class="ov-btn" id="ov-btn-table"   onclick="ovToggleTable()"    title="Ver por cola">▼</button>
-        <button class="ov-btn" id="ov-btn-minimize" onclick="ovToggleMinimize()" title="Minimizar">－</button>
       </div>
     </div>
 
@@ -854,7 +850,6 @@
     const OV_BASE_WIDTH = 360;
     const OV_ZOOM_WIDTHS = [360, 520, 700, 900];
 
-    let ovMinimized = false;
     let ovTableOpen = false;
     let ovDragging  = false;
     let ovResizing  = false;
@@ -1023,13 +1018,6 @@
       e.preventDefault();
       e.stopPropagation();
     }, { passive: false });
-
-    // --- Minimizar ---
-    function ovToggleMinimize() {
-      ovMinimized = !ovMinimized;
-      ovPanel.classList.toggle('ov-minimized', ovMinimized);
-      document.getElementById('ov-btn-minimize').textContent = ovMinimized ? '＋' : '－';
-    }
 
     function ovToggleZoom() {
       ovZoomStep = (ovZoomStep + 1) % OV_ZOOM_WIDTHS.length;
@@ -1206,6 +1194,7 @@
         let worstPanelName = '';
         let worstPanelWait = 0;
         let worstPanelCola = 0;
+        const impactedQueues = [];
 
         tbody.innerHTML = data.paneles.map(function (p) {
           const nombre = p.nombre.includes(' - ') ? p.nombre.split(' - ').slice(1).join(' - ') : p.nombre;
@@ -1231,6 +1220,15 @@
             worstPanelCola = colaCount;
           }
 
+          if (colaCount > 0 || level !== 'ok') {
+            impactedQueues.push({
+              nombre: nombre,
+              cola: colaCount,
+              waitSec: waitSec,
+              level: level,
+            });
+          }
+
           const rowClass = level === 'crit' ? 'ov-row-crit' : (level === 'warn' ? 'ov-row-warn' : '');
           return `<tr class="${rowClass}">
             <td title="${p.nombre}">${nombre}</td>
@@ -1246,37 +1244,59 @@
           worstLevel === 'crit' ? 'ov-level-crit' : (worstLevel === 'warn' ? 'ov-level-warn' : 'ov-level-ok')
         );
 
+        const topImpacted = impactedQueues
+          .slice()
+          .sort(function (a, b) {
+            if (b.cola !== a.cola) return b.cola - a.cola;
+            return b.waitSec - a.waitSec;
+          })
+          .slice(0, 3);
+
+        function ovFmtQueueName(name) {
+          return `cola "${name}"`;
+        }
+
+        const focusQueue = topImpacted.length > 0 ? topImpacted[0] : {
+          nombre: worstPanelName,
+          cola: worstPanelCola,
+          waitSec: worstPanelWait,
+          level: worstLevel,
+        };
+        const focusName = ovFmtQueueName(focusQueue.nombre || worstPanelName || 'sin foco');
+        const focusCola = Number(focusQueue.cola || worstPanelCola || 0);
+        const focusWait = Number(focusQueue.waitSec || worstPanelWait || 0);
+
         if (worstLevel === 'crit') {
           statusEl.className = 'ov-st-crit';
-          statusEl.textContent = `ROJO: ${worstPanelName} con ${worstPanelCola} en cola (${ovFormatWait(worstPanelWait)})`;
+          statusEl.textContent = `ROJO: ${focusName} con ${focusCola} en cola (${ovFormatWait(focusWait)})`;
           ovSetMood('crit', [
-            `Accion inmediata: reforzar ${worstPanelName}`,
-            `Prioridad alta: bajar ${worstPanelCola} en cola`,
-            `Mover apoyo ahora a ${worstPanelName}`,
+            `Accion inmediata: reforzar ${focusName}.`,
+            `Meta urgente: bajar ${focusName} (${focusCola} en cola).`,
+            `Derivar apoyo ya a ${focusName}.`,
           ], trend, forceMoodNow);
         } else if (worstLevel === 'warn') {
           statusEl.className = 'ov-st-warn';
-          statusEl.textContent = `AMARILLO: ${worstPanelName} en seguimiento (${ovFormatWait(worstPanelWait)})`;
+          statusEl.textContent = `AMARILLO: ${focusName} en seguimiento (${ovFormatWait(focusWait)})`;
           ovSetMood('warn', [
-            `Atencion: apoyar ${worstPanelName}`,
-            `Prevenir escalada en ${worstPanelName}`,
-            `Ajustar agentes para evitar pico`,
+            `Atencion: apoyar ${focusName}.`,
+            `Prevenir escalada en ${focusName}.`,
+            `Ajustar agentes en ${focusName} antes de pico.`,
           ], trend, forceMoodNow);
         } else {
           statusEl.className = 'ov-st-ok';
           statusEl.textContent = 'VERDE: Operación estable';
           ovSetMood('ok', [
-            'Buen ritmo: mantener dotacion actual',
-            'Operacion estable: sostener nivel de servicio',
-            'Sin presion: monitoreo preventivo activo',
+            'Buen ritmo: mantener dotacion actual.',
+            'Operacion estable: sostener nivel de servicio.',
+            'Sin presion: monitoreo preventivo activo.',
           ], trend, forceMoodNow);
         }
 
         ovMaybeNotify(
           worstLevel,
           worstLevel === 'crit'
-            ? `${worstPanelName}: ${worstPanelCola} en cola durante ${ovFormatWait(worstPanelWait)}`
-            : `${worstPanelName}: cola en aumento (${ovFormatWait(worstPanelWait)})`
+            ? `Critico en ${focusName}: ${focusCola} en cola (${ovFormatWait(focusWait)}).`
+            : `Atencion en ${focusName}: ${focusCola} en cola (${ovFormatWait(focusWait)}).`
         );
 
         document.getElementById('ov-btn-table').style.display = '';
