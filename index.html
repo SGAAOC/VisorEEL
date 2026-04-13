@@ -896,10 +896,6 @@
     const OV_VOICE_RATE = 1.1;
     const OV_VOICE_PITCH = 1.3;
     const OV_VOICE_VOLUME = 1.0;
-    const OV_VOICE_TRANSITION_ONLY = true;
-    // Si defines esta URL (proxy propio), se usa voz cloud estable.
-    // Debe aceptar POST JSON { text, lang, preferredGender } y responder audio (mp3/wav/ogg).
-    const OV_CLOUD_TTS_URL = '';
     const OV_BASE_WIDTH = 360;
     const OV_ZOOM_WIDTHS = [360, 520, 700, 900];
 
@@ -921,12 +917,7 @@
     let ovMoodLastKind = 'loading';
     let ovVoiceEnabled = false;
     let ovLastVoiceAt = 0;
-    let ovLastVoiceSignature = '';
-    let ovLastVoiceLevel = 'ok';
     let ovSpeakingNow = false;
-    let ovVoiceUnlocked = false;
-    let ovVoicesReady = false;
-    let ovPreferredFemaleVoice = null;
     const OV_MOOD_ROTATE_SEC = 15;
     const OV_MOOD_FAST_DROP_DELTA = 6;
     const ovQueueState = {};
@@ -942,70 +933,19 @@
     }
 
     function ovPickFemaleVoice() {
-      if (!ovVoiceSupported()) return null;
-      const voices = window.speechSynthesis.getVoices() || [];
+      const voices = (typeof window !== 'undefined' && window.speechSynthesis) 
+        ? window.speechSynthesis.getVoices() 
+        : [];
       if (!voices.length) return null;
-
-      // Named female voices (prioritized)
-      const targetNames = ['maria', 'susanda', 'cortana', 'victoria', 'samantha', 'karen', 'moira', 'zira', 'paulina', 'sofia', 'monica', 'helena', 'lucia', 'carmen', 'conchita', 'rosa', 'ana'];
-      const byTargetName = voices.find(function (v) {
-        const name = String(v.name || '').toLowerCase();
-        return targetNames.some(function(target) { return name.includes(target); });
-      });
-      if (byTargetName) return byTargetName;
       
-      // Voces en español con género femenino
-      const spanish = voices.filter(function (v) {
-        const lang = String(v.lang || '').toLowerCase();
-        return lang.startsWith('es');
-      });
+      const targetNames = ['maria', 'susanda', 'cortana', 'victoria', 'samantha', 'karen', 'moira', 'zira'];
+      const byName = voices.find(v => targetNames.some(t => v.name.toLowerCase().includes(t)));
+        if (byName) return byName;
       
-      const spanishFemaleByGender = spanish.filter(function (v) {
-        return v.gender === 'female';
-      });
-      if (spanishFemaleByGender.length) return spanishFemaleByGender[0];
+        const byGender = voices.find(v => v.gender === 'female');
+        if (byGender) return byGender;
       
-      // Cualquier voz con gender === 'female'
-      const anyFemaleByGender = voices.filter(function (v) {
-        return v.gender === 'female';
-      });
-      if (anyFemaleByGender.length) return anyFemaleByGender[0];
-      
-      // Búsqueda por palabras clave femeninas
-      const femaleHints = /(female|woman|mujer|paulina|sofia|monica|helena|maria|lucia|susanda|cortana|victoria|karen|moira|zira|espa[nñ]ol|carmen|conchita|rosa|ana)/i;
-      const femaleByName = voices.filter(function (v) {
-        return femaleHints.test(String(v.name || ''));
-      });
-      if (femaleByName.length) return femaleByName[0];
-      
-      // Fallback: primera voz disponible
-      return voices[0] || null;
-    }
-
-    function ovInitVoices() {
-      if (!ovVoiceSupported() || ovVoicesReady) return;
-      ovPreferredFemaleVoice = ovPickFemaleVoice();
-      ovVoicesReady = true;
-    }
-
-    function ovUpdateVoiceButton() {
-      if (!ovVoiceBtn) return;
-      if (!ovVoiceSupported()) {
-        ovVoiceBtn.textContent = '🔇';
-        ovVoiceBtn.title = 'Voz no disponible en este navegador';
-        ovVoiceBtn.classList.remove('ov-btn-voice-on', 'ov-btn-voice-off');
-        return;
-      }
-      ovVoiceBtn.classList.remove('ov-btn-voice-on', 'ov-btn-voice-off');
-      if (ovVoiceEnabled) {
-        ovVoiceBtn.textContent = '🔊';
-        ovVoiceBtn.title = 'Voz activada';
-        ovVoiceBtn.classList.add('ov-btn-voice-on');
-      } else {
-        ovVoiceBtn.textContent = '🔇';
-        ovVoiceBtn.title = 'Voz desactivada';
-        ovVoiceBtn.classList.add('ov-btn-voice-off');
-      }
+        return voices[0] || null;
     }
 
     function ovToggleVoice() {
@@ -1019,7 +959,7 @@
         return;
       }
 
-      ovTestVoice(true);
+        // Voice toggle doesn't auto-announce
     }
 
     function ovUpdateZoomButton() {
@@ -1176,9 +1116,6 @@
       ovUpdateZoomButton();
     }
 
-    function ovUpdateScale() {
-      // Sin escalado interno: el panel crece de forma nativa con su ancho.
-    }
 
     // --- Toggle tabla ---
     function ovToggleTable() {
@@ -1225,41 +1162,37 @@
     function ovBuildVoiceMessage(level, focusName, focusCola, focusWait, topQueues) {
       const cleanName = String(focusName || '').replaceAll('"', '');
       const waitText = ovFormatVoiceWait(focusWait);
-
+      
+      // Primary: Focus on worst queue with full detail
+      let mainPart = '';
       if (level === 'crit') {
-        return `Alerta critica en ${cleanName}. ${focusCola} pendientes, espera ${waitText}.`;
+        mainPart = `Alerta critica en ${cleanName}. ${focusCola} pendientes, espera ${waitText}.`;
+      } else if (level === 'warn') {
+        mainPart = `Atencion en ${cleanName}. ${focusCola} pendientes.`;
       }
-      if (level === 'warn') {
-        return `Atencion en ${cleanName}. ${focusCola} pendientes.`;
+      if (!mainPart) return '';
+      
+      // Secondary: Brief summary of other alert-level queues
+      const otherAlerts = (topQueues || [])
+        .filter(function(q) {
+          // Exclude the main focus and only include those in warn/crit
+          if (q.nombre === focusName) return false;
+          const qLevel = ovGetLevel(q.cola, q.wait_sec);
+          return qLevel === 'warn' || qLevel === 'crit';
+        })
+        .slice(0, 2); // Max 2 more queues
+      
+      let secondaryPart = '';
+      if (otherAlerts.length > 0) {
+        const briefList = otherAlerts.map(function(q) {
+          return `${q.nombre} ${q.cola}`;
+        }).join(', ');
+        secondaryPart = ` Tambien atencion en: ${briefList}.`;
       }
-      return '';
+      
+      return mainPart + secondaryPart;
     }
 
-    async function ovSpeakCloud(text) {
-      if (!OV_CLOUD_TTS_URL) return false;
-      const response = await fetch(OV_CLOUD_TTS_URL, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ text: text, lang: OV_VOICE_LANG, preferredGender: 'female' }),
-      });
-      if (!response.ok) return false;
-      const blob = await response.blob();
-      if (!blob || !blob.size) return false;
-      const audioUrl = URL.createObjectURL(blob);
-      const audio = new Audio(audioUrl);
-      audio.volume = OV_VOICE_VOLUME;
-      ovSpeakingNow = true;
-      audio.onended = function () {
-        ovSpeakingNow = false;
-        URL.revokeObjectURL(audioUrl);
-      };
-      audio.onerror = function () {
-        ovSpeakingNow = false;
-        URL.revokeObjectURL(audioUrl);
-      };
-      await audio.play();
-      return true;
-    }
 
     function ovSpeakLocal(text) {
       if (!ovVoiceSupported()) return;
@@ -1305,47 +1238,23 @@
       window.speechSynthesis.speak(utterance);
     }
 
-    function ovTestVoice(isFromToggle) {
-      if (!ovVoiceSupported()) return;
-      if (!ovVoiceEnabled && !isFromToggle) return;
-
-      const testMessage = 'Voz activa. Monitoreo operativo listo.';
-      ovVoiceUnlocked = true;
-      try {
-        ovSpeakLocal(testMessage);
-      } catch (e) {
-        // Ignorar errores de prueba.
-      }
-    }
 
     async function ovMaybeSpeak(level, focusName, focusCola, focusWait, topQueues) {
       if (!ovVoiceEnabled || !ovVoiceSupported()) return;
-      if (!ovVoiceUnlocked) return;
       if (ovSpeakingNow) return;
       // Only speak on warn or crit, skip ok
       if (level === 'ok') return;
 
       const now = Date.now();
       const regularGap = OV_VOICE_INTERVAL_SEC * 1000;
-      const minGap = regularGap;
-      const topSig = (topQueues || []).slice(0, 3).map(q => `${q.nombre}:${q.cola}`).join('|');
-      const signature = `${level}|${focusName}|${focusCola}|${Math.floor((focusWait || 0) / 30)}|${topSig}`;
 
-      if (signature === ovLastVoiceSignature && now - ovLastVoiceAt < minGap) return;
-      if (now - ovLastVoiceAt < minGap && level === ovLastVoiceLevel) return;
+        if (now - ovLastVoiceAt < regularGap) return;
 
       const text = ovBuildVoiceMessage(level, focusName, focusCola, focusWait, topQueues);
       if (!text) return;
 
-      try {
-        const cloudSpoken = await ovSpeakCloud(text);
-        if (!cloudSpoken) ovSpeakLocal(text);
+        ovSpeakLocal(text);
         ovLastVoiceAt = now;
-        ovLastVoiceSignature = signature;
-        ovLastVoiceLevel = level;
-      } catch (e) {
-        try { ovSpeakLocal(text); } catch (e2) {}
-      }
     }
 
     function ovPlayAlertTone(level) {
