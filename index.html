@@ -546,14 +546,27 @@
     .ov-table td:first-child { text-align: left; font-weight: 500; }
     .ov-table tr:nth-child(even) td { background: #f5f7fa; }
     .ov-table tr:hover td { background: var(--essalud-blue-light); }
-    .ov-td-alerta { color: var(--essalud-red) !important; font-weight: 900 !important; }
-    .ov-cola-cell {
+    .ov-td-ok { color: #333 !important; font-weight: 900 !important; }
+    .ov-td-warn { color: #ad5b00 !important; font-weight: 900 !important; }
+    .ov-td-crit { color: var(--essalud-red) !important; font-weight: 900 !important; }
+    .ov-cola-cell,
+    .ov-disp-cell {
       white-space: nowrap;
       font-variant-numeric: tabular-nums;
       font-weight: 800;
     }
-    .ov-row-warn td { background: #fff6e8 !important; }
+    td.ov-disp-cell.ov-td-disp-flash {
+      animation: ov-green-bg-flash 1s ease-in-out infinite alternate;
+      background: rgba(15, 157, 88, 0.18) !important;
+      background-image: none !important;
+      color: #0f9d58 !important;
+    }
+    .ov-row-warn td { background: #fff8e0 !important; }
     .ov-row-crit td { background: #ffe9ec !important; }
+    @keyframes ov-green-bg-flash {
+      from { background-color: rgba(15, 157, 88, 0.18); }
+      to { background-color: rgba(15, 157, 88, 0.30); }
+    }
 
     /* Footer de estado */
     .ov-footer {
@@ -1505,11 +1518,27 @@
           });
 
           const rowClass = level === 'crit' ? 'ov-row-crit' : (level === 'warn' ? 'ov-row-warn' : '');
+          const colaClass = level === 'crit'
+            ? 'ov-td-crit'
+            : level === 'warn'
+              ? 'ov-td-warn'
+              : 'ov-td-ok';
+
+
+          const dispClass = Number(p.desocupados || 0) >= 1 ? 'ov-td-disp-flash' : '';
+
+
+
+
+
+
+
+          
           return `<tr class="${rowClass}">
             <td title="${p.nombre}">${nombre}</td>
-            <td class="ov-cola-cell ${p.cola > 0 ? 'ov-td-alerta' : ''}">${colaCount}</td>
+            <td class="ov-cola-cell ${colaClass}">${colaCount}</td>
             <td>${p.ocupados}</td>
-            <td>${p.desocupados}</td>
+            <td class="ov-disp-cell ${dispClass}">${p.desocupados}</td>
 
           </tr>`;
         }).join('');
@@ -1546,7 +1575,7 @@
           } else if (q.level === 'warn') {
             return { kind: 'warn', text: `${qName}: atención requerida - ${Number(q.cola)} pendientes (${ovFormatWait(Number(q.waitSec))})` };
           } else {
-            return { kind: 'ok', text: `${qName}: operación estable` };
+            return { kind: 'ok', text: `${qName}: canal estable` };
           }
         });
 
@@ -1570,7 +1599,7 @@
           ovSetMood('warn', rotationPool, '', forceMoodNow);
         } else {
           statusEl.className = 'ov-st-ok';
-          statusEl.textContent = 'Operación estable';
+          statusEl.textContent = 'Canal estable';
           ovSetMood('ok', rotationPool, '', forceMoodNow);
         }
 
