@@ -813,10 +813,11 @@
               <th>Pendientes</th>
               <th>Ocup.</th>
               <th>Disp.</th>
+              <th>Tot. Log.</th>
             </tr>
           </thead>
           <tbody id="ov-tabla-body">
-            <tr><td colspan="4" style="text-align:center;color:#999;padding:10px;">Sin datos</td></tr>
+            <tr><td colspan="5" style="text-align:center;color:#999;padding:10px;">Sin datos</td></tr>
           </tbody>
         </table>
       </div>
@@ -1524,22 +1525,19 @@
               ? 'ov-td-warn'
               : 'ov-td-ok';
 
-
           const dispClass = Number(p.desocupados || 0) >= 1 ? 'ov-td-disp-flash' : '';
 
+          // --- CÁLCULO DE TOTAL LOGUEADOS (Ocupados + Disponibles) ---
+          const ocupadosNum = Number(p.ocupados || 0);
+          const desocupadosNum = Number(p.desocupados || 0);
+          const totalLogueados = ocupadosNum + desocupadosNum;
 
-
-
-
-
-
-          
           return `<tr class="${rowClass}">
             <td title="${p.nombre}">${nombre}</td>
             <td class="ov-cola-cell ${colaClass}">${colaCount}</td>
             <td>${p.ocupados}</td>
             <td class="ov-disp-cell ${dispClass}">${p.desocupados}</td>
-
+            <td style="font-weight: 800; font-variant-numeric: tabular-nums; color: #003d82;">${totalLogueados}</td>
           </tr>`;
         }).join('');
 
@@ -1613,7 +1611,7 @@
 
         document.getElementById('ov-btn-table').style.display = '';
       } else {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#999;padding:8px;">Sin datos</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#999;padding:8px;">Sin datos</td></tr>';
         colaKpiEl.classList.remove('ov-level-warn', 'ov-level-crit');
         colaKpiEl.classList.add('ov-level-ok');
         statusEl.className = 'ov-st-loading';
